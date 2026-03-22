@@ -1,0 +1,389 @@
+generator client {
+  provider   = "prisma-client"
+  output     = "../src/generated/prisma"
+  engineType = "client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+enum TenantStatus {
+  ACTIVE
+  ARCHIVED
+  TRIAL
+}
+
+enum TenantRole {
+  OWNER
+  ADMIN
+  MEMBER
+  GUEST
+  CHILD
+}
+
+enum AccessEntryMode {
+  ACCESS_CODE
+  PASSWORD
+  MIXED
+}
+
+enum FamilyHomePreset {
+  BALANCED
+  PLANNER
+  STORY
+}
+
+enum FamilyEntryPreset {
+  GUIDED
+  DIRECT
+}
+
+enum VisibilityScope {
+  FAMILY
+  ADULTS
+  MEMBERS
+  CHILDREN
+  PRIVATE
+}
+
+enum ModuleKey {
+  ANNOUNCEMENTS
+  POSTS
+  GALLERY
+  CALENDAR
+  TODO
+  DIARY
+  SCHOOL_TIMETABLE
+  DAY_PLANNER
+  PROGRESS
+  HABITS
+}
+
+model User {
+  id             String          @id @default(cuid())
+  name           String?
+  email          String?         @unique
+  passwordHash   String?
+  passwordSetAt  DateTime?
+  emailVerified  DateTime?
+  image          String?
+  accounts       Account[]
+  sessions       Session[]
+  authenticators Authenticator[]
+  memberships    Membership[]
+  createdTenants FamilyTenant[]  @relation("FamilyTenantCreator")
+  updatedWorkspaces FamilyWorkspace[] @relation("FamilyWorkspaceUpdatedBy")
+  familyAccessSessions FamilyAccessSession[] @relation("FamilyAccessSessionUser")
+  announcements  Announcement[]  @relation("AnnouncementAuthor")
+  posts          Post[]          @relation("PostAuthor")
+  events         CalendarEvent[] @relation("CalendarEventAuthor")
+  todoLists      TodoList[]      @relation("TodoListAuthor")
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?  @db.Text
+  access_token      String?  @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?  @db.Text
+  session_state     String?
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@id([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@id([sessionToken])
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@id([identifier, token])
+}
+
+model Authenticator {
+  credentialID         String  @unique
+  userId               String
+  providerAccountId    String
+  credentialPublicKey  String  @db.Text
+  counter              Int
+  credentialDeviceType String
+  credentialBackedUp   Boolean
+  transports           String?
+  user                 User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, credentialID])
+}
+
+model FamilyTenant {
+  id                   String                @id @default(cuid())
+  slug                 String                @unique
+  name                 String
+  description          String?
+  tagline              String?
+  welcomeMessage       String?
+  heroSummary          String?
+  householdMood        String?
+  timezone             String                @default("Asia/Seoul")
+  memberCount          Int                   @default(1)
+  status               TenantStatus          @default(ACTIVE)
+  createdByUserId      String?
+  createdBy            User?                 @relation("FamilyTenantCreator", fields: [createdByUserId], references: [id], onDelete: SetNull)
+  accessPolicy         FamilyAccessPolicy?
+  theme                FamilyTheme?
+  domains              FamilyDomain[]
+  workspace            FamilyWorkspace?
+  memberships          Membership[]
+  familyAccessSessions FamilyAccessSession[]
+  modules              EnabledModule[]
+  announcements        Announcement[]
+  posts                Post[]
+  events               CalendarEvent[]
+  todoLists            TodoList[]
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+
+  @@index([status])
+  @@index([createdByUserId])
+}
+
+model FamilyAccessPolicy {
+  id                   String          @id @default(cuid())
+  tenantId             String          @unique
+  entryMode            AccessEntryMode @default(ACCESS_CODE)
+  sharedSecretHash     String?
+  allowGuestRead       Boolean         @default(true)
+  requireMemberProfile Boolean         @default(false)
+  sessionDurationHours Int             @default(18)
+  tenant               FamilyTenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+}
+
+model FamilyTheme {
+  id             String       @id @default(cuid())
+  tenantId       String       @unique
+  brandName      String?
+  accentColor    String?
+  warmColor      String?
+  surfaceColor   String?
+  highlightColor String?
+  tenant         FamilyTenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+/// Hostnames currently live in `customDomains` inside the file store and need a dedicated table before DB cutover.
+model FamilyDomain {
+  id         String       @id @default(cuid())
+  tenantId   String
+  hostname   String       @unique
+  isPrimary  Boolean      @default(false)
+  verifiedAt DateTime?
+  tenant     FamilyTenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  @@index([tenantId, isPrimary])
+}
+
+/// Home/entry presets are separate from module ordering; module enablement and sort order stay in `EnabledModule`.
+model FamilyWorkspace {
+  id              String           @id @default(cuid())
+  tenantId        String           @unique
+  homePreset      FamilyHomePreset @default(BALANCED)
+  entryPreset     FamilyEntryPreset @default(GUIDED)
+  updatedByUserId String?
+  tenant          FamilyTenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  updatedBy       User?            @relation("FamilyWorkspaceUpdatedBy", fields: [updatedByUserId], references: [id], onDelete: SetNull)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@index([updatedByUserId])
+}
+
+/// Shared-secret session for `/f/[familySlug]`. This is intentionally separate from Auth.js `Session`.
+model FamilyAccessSession {
+  id             String          @id @default(cuid())
+  sessionToken   String          @unique
+  tenantId       String
+  userId         String?
+  viewerRole     TenantRole      @default(GUEST)
+  entryMode      AccessEntryMode
+  expiresAt      DateTime
+  lastVerifiedAt DateTime        @default(now())
+  tenant         FamilyTenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user           User?           @relation("FamilyAccessSessionUser", fields: [userId], references: [id], onDelete: SetNull)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  @@index([tenantId, expiresAt])
+  @@index([userId])
+}
+
+model Membership {
+  id          String       @id @default(cuid())
+  userId      String
+  tenantId    String
+  role        TenantRole   @default(MEMBER)
+  displayName String?
+  isPrimary   Boolean      @default(false)
+  joinedAt    DateTime     @default(now())
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant      FamilyTenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tenantId])
+  @@index([tenantId, role])
+}
+
+model EnabledModule {
+  id        String       @id @default(cuid())
+  tenantId  String
+  moduleKey ModuleKey
+  enabled   Boolean      @default(true)
+  sortOrder Int          @default(0)
+  settings  Json?
+  tenant    FamilyTenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@unique([tenantId, moduleKey])
+  @@index([tenantId, enabled, sortOrder])
+}
+
+model Announcement {
+  id                  String          @id @default(cuid())
+  tenantId            String
+  authorId            String
+  title               String
+  summary             String?
+  body                String          @db.Text
+  visibilityScope     VisibilityScope @default(FAMILY)
+  featuredOnHome      Boolean         @default(true)
+  pinnedOnHome        Boolean         @default(false)
+  homePriority        Int             @default(50)
+  displayStartsAt     DateTime?
+  displayEndsAt       DateTime?
+  readTrackingEnabled Boolean         @default(true)
+  commentsEnabled     Boolean         @default(false)
+  publishedAt         DateTime?
+  tenant              FamilyTenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  author              User            @relation("AnnouncementAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+
+  @@index([tenantId, pinnedOnHome, homePriority])
+  @@index([tenantId, publishedAt])
+}
+
+model Post {
+  id                  String          @id @default(cuid())
+  tenantId            String
+  authorId            String
+  title               String
+  summary             String?
+  body                String          @db.Text
+  visibilityScope     VisibilityScope @default(FAMILY)
+  featuredOnHome      Boolean         @default(false)
+  pinnedOnHome        Boolean         @default(false)
+  homePriority        Int             @default(50)
+  displayStartsAt     DateTime?
+  displayEndsAt       DateTime?
+  readTrackingEnabled Boolean         @default(false)
+  commentsEnabled     Boolean         @default(true)
+  tenant              FamilyTenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  author              User            @relation("PostAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+
+  @@index([tenantId, pinnedOnHome, homePriority])
+}
+
+model CalendarEvent {
+  id                  String          @id @default(cuid())
+  tenantId            String
+  authorId            String
+  title               String
+  summary             String?
+  notes               String?         @db.Text
+  visibilityScope     VisibilityScope @default(FAMILY)
+  featuredOnHome      Boolean         @default(true)
+  pinnedOnHome        Boolean         @default(false)
+  homePriority        Int             @default(50)
+  displayStartsAt     DateTime?
+  displayEndsAt       DateTime?
+  readTrackingEnabled Boolean         @default(false)
+  commentsEnabled     Boolean         @default(false)
+  startsAt            DateTime
+  endsAt              DateTime
+  isAllDay            Boolean         @default(false)
+  location            String?
+  tenant              FamilyTenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  author              User            @relation("CalendarEventAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+
+  @@index([tenantId, startsAt, endsAt])
+  @@index([tenantId, pinnedOnHome, homePriority])
+}
+
+model TodoList {
+  id                  String          @id @default(cuid())
+  tenantId            String
+  authorId            String
+  title               String
+  summary             String?
+  visibilityScope     VisibilityScope @default(FAMILY)
+  featuredOnHome      Boolean         @default(true)
+  pinnedOnHome        Boolean         @default(false)
+  homePriority        Int             @default(50)
+  displayStartsAt     DateTime?
+  displayEndsAt       DateTime?
+  readTrackingEnabled Boolean         @default(false)
+  commentsEnabled     Boolean         @default(false)
+  items               TodoItem[]
+  tenant              FamilyTenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  author              User            @relation("TodoListAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+
+  @@index([tenantId, pinnedOnHome, homePriority])
+}
+
+model TodoItem {
+  id          String    @id @default(cuid())
+  listId      String
+  title       String
+  notes       String?   @db.Text
+  sortOrder   Int       @default(0)
+  isCompleted Boolean   @default(false)
+  completedAt DateTime?
+  list        TodoList  @relation(fields: [listId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([listId, sortOrder])
+}

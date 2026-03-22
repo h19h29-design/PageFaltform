@@ -1,0 +1,27 @@
+{
+  "name": "@ysplan/tenant",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@ysplan/dashboard": "file:../dashboard",
+    "@ysplan/modules-announcements": "file:../modules/announcements",
+    "@ysplan/modules-calendar": "file:../modules/calendar",
+    "@ysplan/modules-core": "file:../modules/core",
+    "@ysplan/modules-day-planner": "file:../modules/day-planner",
+    "@ysplan/modules-diary": "file:../modules/diary",
+    "@ysplan/modules-gallery": "file:../modules/gallery",
+    "@ysplan/modules-habits": "file:../modules/habits",
+    "@ysplan/modules-posts": "file:../modules/posts",
+    "@ysplan/modules-progress": "file:../modules/progress",
+    "@ysplan/modules-school-timetable": "file:../modules/school-timetable",
+    "@ysplan/modules-todo": "file:../modules/todo"
+  },
+  "scripts": {
+    "lint": "eslint . --max-warnings=0",
+    "typecheck": "tsc --project tsconfig.json --noEmit"
+  }
+}

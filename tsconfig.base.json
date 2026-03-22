@@ -1,0 +1,47 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ES2022"
+    ],
+    "allowJs": false,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "jsx": "preserve",
+    "baseUrl": ".",
+    "paths": {
+      "@ysplan/api": [
+        "packages/api/src/index.ts"
+      ],
+      "@ysplan/auth": [
+        "packages/auth/src/index.ts"
+      ],
+      "@ysplan/dashboard": [
+        "packages/dashboard/src/index.ts"
+      ],
+      "@ysplan/database": [
+        "packages/database/src/index.ts"
+      ],
+      "@ysplan/modules-core": [
+        "packages/modules/core/src/index.ts"
+      ],
+      "@ysplan/platform": [
+        "packages/platform/src/index.ts"
+      ],
+      "@ysplan/tenant": [
+        "packages/tenant/src/index.ts"
+      ],
+      "@ysplan/ui": [
+        "packages/ui/src/index.tsx"
+      ]
+    }
+  }
+}

@@ -1,0 +1,14 @@
+node_modules
+.next
+dist
+coverage
+*.log
+*.tsbuildinfo
+.turbo/
+output/
+.codex-dev.pid
+.codex-dev.log
+.env
+.env.local
+.env.*.local
+apps/web/data/local-platform-auth.json

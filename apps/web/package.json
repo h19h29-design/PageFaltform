@@ -1,0 +1,31 @@
+{
+  "name": "@ysplan/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint . --max-warnings=0",
+    "typecheck": "tsc --project tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@ysplan/auth": "file:../../packages/auth",
+    "@ysplan/database": "file:../../packages/database",
+    "@ysplan/dashboard": "file:../../packages/dashboard",
+    "@ysplan/modules-calendar": "file:../../packages/modules/calendar",
+    "@ysplan/modules-core": "file:../../packages/modules/core",
+    "@ysplan/modules-day-planner": "file:../../packages/modules/day-planner",
+    "@ysplan/modules-habits": "file:../../packages/modules/habits",
+    "@ysplan/modules-school-timetable": "file:../../packages/modules/school-timetable",
+    "@ysplan/modules-progress": "file:../../packages/modules/progress",
+    "@ysplan/modules-todo": "file:../../packages/modules/todo",
+    "@ysplan/platform": "file:../../packages/platform",
+    "@ysplan/tenant": "file:../../packages/tenant",
+    "@ysplan/ui": "file:../../packages/ui",
+    "next": "^16.1.7",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
+  }
+}

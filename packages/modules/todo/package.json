@@ -1,0 +1,17 @@
+{
+  "name": "@ysplan/modules-todo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@ysplan/dashboard": "file:../../dashboard",
+    "@ysplan/modules-core": "file:../core"
+  },
+  "scripts": {
+    "lint": "eslint . --max-warnings=0",
+    "typecheck": "tsc --project tsconfig.json --noEmit"
+  }
+}

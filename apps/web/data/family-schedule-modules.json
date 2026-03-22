@@ -1,0 +1,205 @@
+{
+  "version": 1,
+  "metadata": {
+    "backend": "file",
+    "lastWriteAt": "2026-03-21T02:21:42.195Z"
+  },
+  "families": {
+    "yoon": {
+      "calendar": [
+        {
+          "id": "dentist",
+          "slug": "dentist",
+          "audience": "family-shared",
+          "visibilityScope": "all",
+          "title": "민서 치과 예약",
+          "startsAt": "2026-03-19T15:30:00+09:00",
+          "endsAt": "2026-03-19T16:20:00+09:00",
+          "location": "연희동 치과",
+          "affectsFamilyFlow": true
+        },
+        {
+          "id": "grocery-run",
+          "slug": "grocery-run",
+          "audience": "family-shared",
+          "visibilityScope": "all",
+          "title": "저녁 장보기",
+          "startsAt": "2026-03-19T18:10:00+09:00",
+          "endsAt": "2026-03-19T19:00:00+09:00",
+          "location": "동네 마트",
+          "affectsFamilyFlow": true
+        },
+        {
+          "id": "mom-bank",
+          "slug": "mom-bank",
+          "audience": "personal",
+          "visibilityScope": "adults",
+          "title": "엄마 은행 방문",
+          "startsAt": "2026-03-19T12:30:00+09:00",
+          "endsAt": "2026-03-19T13:10:00+09:00",
+          "ownerLabel": "엄마",
+          "affectsFamilyFlow": true
+        },
+        {
+          "id": "dad-lunch",
+          "slug": "dad-lunch",
+          "audience": "personal",
+          "visibilityScope": "private",
+          "title": "아빠 점심 약속",
+          "startsAt": "2026-03-19T12:00:00+09:00",
+          "endsAt": "2026-03-19T13:00:00+09:00",
+          "ownerLabel": "아빠",
+          "affectsFamilyFlow": false
+        }
+      ],
+      "todo": [
+        {
+          "id": "fae1dbcd-58f2-4f4e-a089-7e06a3423fa1",
+          "slug": "wave-03-todo-1774059683",
+          "audience": "family-shared",
+          "visibilityScope": "all",
+          "title": "Wave 03 todo updated",
+          "dueAt": "2026-03-21T13:00:00.000Z",
+          "completed": true,
+          "blocksFamilyFlow": true,
+          "assigneeLabel": "Local Tester"
+        },
+        {
+          "id": "grocery-restock",
+          "slug": "grocery-restock",
+          "audience": "family-shared",
+          "visibilityScope": "all",
+          "title": "우유와 과일 채워두기",
+          "dueAt": "2026-03-18T20:00:00+09:00",
+          "completed": false,
+          "overdue": true,
+          "blocksFamilyFlow": true
+        },
+        {
+          "id": "indoor-shoes",
+          "slug": "indoor-shoes",
+          "audience": "family-shared",
+          "visibilityScope": "children-safe",
+          "title": "민서 실내화 챙기기",
+          "dueAt": "2026-03-19T07:40:00+09:00",
+          "completed": false,
+          "blocksFamilyFlow": true
+        },
+        {
+          "id": "recycling",
+          "slug": "recycling",
+          "audience": "family-shared",
+          "visibilityScope": "all",
+          "title": "분리수거 내놓기",
+          "dueAt": "2026-03-19T20:30:00+09:00",
+          "completed": false,
+          "blocksFamilyFlow": true
+        },
+        {
+          "id": "dad-gas",
+          "slug": "dad-gas",
+          "audience": "personal",
+          "visibilityScope": "adults",
+          "title": "아빠 차량 주유",
+          "dueAt": "2026-03-19T17:30:00+09:00",
+          "completed": false,
+          "blocksFamilyFlow": true,
+          "assigneeLabel": "아빠"
+        },
+        {
+          "id": "read-book",
+          "slug": "read-book",
+          "audience": "personal",
+          "visibilityScope": "private",
+          "title": "엄마 독서 메모 정리",
+          "dueAt": "2026-03-20T22:00:00+09:00",
+          "completed": false,
+          "blocksFamilyFlow": false,
+          "assigneeLabel": "엄마"
+        }
+      ],
+      "schoolTimetable": [
+        {
+          "id": "52adcd72-ae9f-4084-b0e7-297bf786c224",
+          "slug": "wave-03-school-1774059701",
+          "audience": "family-shared",
+          "visibilityScope": "all",
+          "studentLabel": "Minseo",
+          "title": "After-school English",
+          "startsAt": "2026-03-22T06:00:00.000Z",
+          "affectsFamilyFlow": true,
+          "endsAt": "2026-03-22T08:00:00.000Z",
+          "preparationNote": "Bring workbook"
+        },
+        {
+          "id": "minseo-school-route",
+          "slug": "minseo-school-route",
+          "audience": "family-shared",
+          "visibilityScope": "children-safe",
+          "studentLabel": "민서",
+          "title": "학교 수업과 영어학원",
+          "startsAt": "2026-03-19T08:20:00+09:00",
+          "endsAt": "2026-03-19T17:40:00+09:00",
+          "preparationNote": "체육복, 리코더",
+          "affectsFamilyFlow": true
+        },
+        {
+          "id": "jiwoo-art",
+          "slug": "jiwoo-art",
+          "audience": "personal",
+          "visibilityScope": "children-safe",
+          "studentLabel": "지우",
+          "title": "방과 후 미술 수업",
+          "startsAt": "2026-03-19T16:10:00+09:00",
+          "endsAt": "2026-03-19T17:00:00+09:00",
+          "preparationNote": "앞치마 지참",
+          "affectsFamilyFlow": true
+        },
+        {
+          "id": "jiwoo-reading",
+          "slug": "jiwoo-reading",
+          "audience": "personal",
+          "visibilityScope": "private",
+          "studentLabel": "지우",
+          "title": "독서 기록 정리",
+          "startsAt": "2026-03-19T20:00:00+09:00",
+          "affectsFamilyFlow": false
+        }
+      ],
+      "dayPlanner": [
+        {
+          "id": "afternoon-route",
+          "slug": "afternoon-route",
+          "audience": "family-shared",
+          "visibilityScope": "all",
+          "title": "오후 이동과 저녁 준비",
+          "startsAt": "2026-03-19T16:30:00+09:00",
+          "endsAt": "2026-03-19T19:00:00+09:00",
+          "affectsFamilyFlow": true
+        },
+        {
+          "id": "dad-focus",
+          "slug": "dad-focus",
+          "audience": "personal",
+          "visibilityScope": "adults",
+          "title": "아빠 운동과 집중 시간",
+          "startsAt": "2026-03-19T20:30:00+09:00",
+          "endsAt": "2026-03-19T21:30:00+09:00",
+          "ownerLabel": "아빠",
+          "affectsFamilyFlow": true
+        },
+        {
+          "id": "mom-journal",
+          "slug": "mom-journal",
+          "audience": "personal",
+          "visibilityScope": "private",
+          "title": "엄마 저널 시간",
+          "startsAt": "2026-03-19T22:00:00+09:00",
+          "endsAt": "2026-03-19T22:30:00+09:00",
+          "ownerLabel": "엄마",
+          "affectsFamilyFlow": false
+        }
+      ]
+    }
+  }
+}

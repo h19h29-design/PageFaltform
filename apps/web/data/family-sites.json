@@ -1,0 +1,177 @@
+{
+  "version": 1,
+  "customFamilies": [
+    {
+      "id": "custom-5bb8dd70-c601-4625-97c9-ff9c583047c0",
+      "slug": "mini-seoul",
+      "name": "테스트 가족 라운지",
+      "tagline": "일정과 기록을 실험하는 내부망 가족 홈",
+      "welcomeMessage": "오늘 필요한 카드부터 바로 확인해요.",
+      "heroSummary": "내부망에서 여러 가족 홈을 테스트하기 위한 샘플 가족 홈입니다.",
+      "householdMood": "실험용 데모 가족 홈",
+      "timezone": "Asia/Seoul",
+      "customDomains": [],
+      "memberCount": 5,
+      "enabledModules": [
+        "announcements",
+        "posts",
+        "calendar",
+        "todo",
+        "progress"
+      ],
+      "highlights": [
+        {
+          "label": "이번 달 분위기",
+          "value": "실험용 데모 가족 홈"
+        },
+        {
+          "label": "홈 우선순위",
+          "value": "Announcements, Posts, Calendar"
+        },
+        {
+          "label": "화면 성격",
+          "value": "실행형 보드"
+        }
+      ],
+      "entryChecklist": [
+        {
+          "title": "가족 비밀번호 확인",
+          "description": "가볍게 입장하되, 가족 밖에서는 바로 들어오기 어렵게 최소한의 보호를 둡니다."
+        },
+        {
+          "title": "지금 켜진 모듈 미리 보기",
+          "description": "들어가기 전에 어떤 카드와 모듈이 먼저 보일지 감을 잡을 수 있도록 안내합니다."
+        },
+        {
+          "title": "운영 화면과 분리",
+          "description": "설정 변경과 권한 관리는 콘솔에서만 가능하게 분리해 보안 흐름을 지킵니다."
+        }
+      ],
+      "theme": {
+        "accentColor": "#2f5e4e",
+        "warmColor": "#c26d4e",
+        "surfaceColor": "#fff9f1",
+        "highlightColor": "#ead7bd"
+      },
+      "accessPolicy": {
+        "mode": "password",
+        "label": "가족 비밀번호",
+        "helperText": "가족이 함께 쓰는 비밀번호를 입력하고 들어오세요.",
+        "secret": "mini2026"
+      },
+      "ownerUserId": "user-1",
+      "createdAt": "2026-03-19T01:23:50.410Z",
+      "updatedAt": "2026-03-19T01:23:50.410Z"
+    },
+    {
+      "id": "custom-e7ec5106-38a6-4d5c-af94-a0835e3a7571",
+      "slug": "mini-river",
+      "name": "강변 가족 보드",
+      "tagline": "사진과 루틴을 중심으로 테스트하는 내부망 가족 홈",
+      "welcomeMessage": "기록과 루틴 카드를 편하게 둘러보세요.",
+      "heroSummary": "내부망에서 여러 미니 가족 홈을 비교하기 위한 두 번째 샘플 홈입니다.",
+      "householdMood": "기록과 습관이 많은 가족",
+      "timezone": "Asia/Seoul",
+      "customDomains": [],
+      "memberCount": 4,
+      "enabledModules": [
+        "announcements",
+        "gallery",
+        "calendar",
+        "todo",
+        "diary",
+        "habits"
+      ],
+      "highlights": [
+        {
+          "label": "이번 달 분위기",
+          "value": "기록과 습관이 많은 가족"
+        },
+        {
+          "label": "홈 우선순위",
+          "value": "Announcements, Gallery, Calendar"
+        },
+        {
+          "label": "화면 성격",
+          "value": "기록형 보드"
+        }
+      ],
+      "entryChecklist": [
+        {
+          "title": "입장 코드 확인",
+          "description": "가볍게 입장하되, 가족 밖에서는 바로 들어오기 어렵게 최소한의 보호를 둡니다."
+        },
+        {
+          "title": "지금 켜진 모듈 미리 보기",
+          "description": "들어가기 전에 어떤 카드와 모듈이 먼저 보일지 감을 잡을 수 있도록 안내합니다."
+        },
+        {
+          "title": "운영 화면과 분리",
+          "description": "설정 변경과 권한 관리는 콘솔에서만 가능하게 분리해 보안 흐름을 지킵니다."
+        }
+      ],
+      "theme": {
+        "accentColor": "#2c5d79",
+        "warmColor": "#c86d47",
+        "surfaceColor": "#f5fbff",
+        "highlightColor": "#cfe4f1"
+      },
+      "accessPolicy": {
+        "mode": "code",
+        "label": "입장 코드",
+        "helperText": "초대받은 가족만 알고 있는 코드를 입력하고 들어오세요.",
+        "secret": "river2026"
+      },
+      "ownerUserId": "user-1",
+      "createdAt": "2026-03-19T01:28:24.696Z",
+      "updatedAt": "2026-03-19T01:28:24.696Z"
+    }
+  ],
+  "workspaceDrafts": {
+    "yoon": {
+      "familySlug": "yoon",
+      "enabledModules": [
+        "announcements",
+        "calendar",
+        "todo",
+        "school-timetable",
+        "progress",
+        "posts",
+        "gallery",
+        "diary",
+        "day-planner",
+        "habits"
+      ],
+      "homePreset": "balanced",
+      "entryPreset": "guided",
+      "updatedAt": "2026-03-22T10:00:00.000Z"
+    },
+    "mini-seoul": {
+      "familySlug": "mini-seoul",
+      "enabledModules": [
+        "announcements",
+        "posts",
+        "calendar",
+        "todo",
+        "progress"
+      ],
+      "homePreset": "planner",
+      "entryPreset": "direct",
+      "updatedAt": "2026-03-19T01:23:50.410Z"
+    },
+    "mini-river": {
+      "familySlug": "mini-river",
+      "enabledModules": [
+        "announcements",
+        "gallery",
+        "calendar",
+        "todo",
+        "diary",
+        "habits"
+      ],
+      "homePreset": "story",
+      "entryPreset": "guided",
+      "updatedAt": "2026-03-19T01:28:24.696Z"
+    }
+  }
+}

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>YSplan Dashboard Home Prototype</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23bc5f45'/%3E%3Cpath d='M18 21h28L33 36v11h-2V36L18 21Z' fill='%23fff5ef'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="background-orb background-orb-left"></div>
+    <div class="background-orb background-orb-right"></div>
+    <main class="page-shell">
+      <header class="masthead">
+        <p class="eyebrow">YSplan Dashboard Home Prototype</p>
+        <h1>가족 홈이 허브처럼 느껴지는 첫 화면 초안</h1>
+        <p class="intro">
+          중요 공지, 오늘 일정, 오늘 할 일을 가장 먼저 보여주고, 진행률과 최근 기록은
+          한 걸음 뒤에서 받쳐주는 구성입니다.
+        </p>
+        <div class="assumption-row" id="assumptions"></div>
+      </header>
+
+      <section class="hero-shell" id="hero-slot"></section>
+      <section class="section-grid" id="section-grid"></section>
+    </main>
+
+    <script type="module" src="./app.mjs"></script>
+  </body>
+</html>
