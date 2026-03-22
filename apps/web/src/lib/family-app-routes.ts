@@ -18,83 +18,83 @@ type FamilyModuleRouteSeed = Omit<FamilyModuleRouteSpec, "label" | "description"
 const familyModuleRouteSeeds: Record<ModuleKey, FamilyModuleRouteSeed> = {
   announcements: {
     moduleKey: "announcements",
-    collectionLabel: "공지 목록",
+    collectionLabel: "공지 게시판",
     itemLabel: "공지",
     createLabel: "새 공지 작성",
     exampleSlug: "weekly-briefing",
-    summary: "고정 공지, 긴급 알림, 가족 공용 안내를 확인합니다.",
+    summary: "긴급 공지, 상단 고정 안내, 읽음 확인 공지를 모아봅니다.",
   },
   posts: {
     moduleKey: "posts",
-    collectionLabel: "글 목록",
+    collectionLabel: "글 게시판",
     itemLabel: "글",
     createLabel: "새 글 작성",
     exampleSlug: "weekend-recap",
-    summary: "긴 글, 가이드, 가족 메모를 남깁니다.",
+    summary: "가이드와 근황, 생활 기록을 읽기 좋은 흐름으로 보여줍니다.",
   },
   gallery: {
     moduleKey: "gallery",
-    collectionLabel: "사진첩 목록",
+    collectionLabel: "갤러리",
     itemLabel: "앨범",
     createLabel: "새 앨범 만들기",
     exampleSlug: "spring-walk",
-    summary: "사진 앨범과 추억 중심 기록을 관리합니다.",
+    summary: "사진과 짧은 메모를 함께 모아 최근 추억이 잘 보이게 보여줍니다.",
   },
   calendar: {
     moduleKey: "calendar",
-    collectionLabel: "일정 목록",
+    collectionLabel: "가족 일정표",
     itemLabel: "일정",
     createLabel: "새 일정 추가",
     exampleSlug: "school-run",
-    summary: "가족 일정과 시간 흐름을 함께 정리합니다.",
+    summary: "월간 캘린더와 오늘 일정 목록으로 가족 일정을 한눈에 정리합니다.",
   },
   todo: {
     moduleKey: "todo",
-    collectionLabel: "체크리스트 목록",
+    collectionLabel: "체크리스트",
     itemLabel: "할 일",
-    createLabel: "새 할 일 추가",
+    createLabel: "할 일 추가",
     exampleSlug: "saturday-reset",
-    summary: "할 일, 집안일, 마감 체크를 관리합니다.",
+    summary: "지연 항목, 오늘 할 일, 완료 항목을 체크리스트 방식으로 관리합니다.",
   },
   diary: {
     moduleKey: "diary",
-    collectionLabel: "일기 목록",
+    collectionLabel: "일기장",
     itemLabel: "일기",
     createLabel: "새 일기 작성",
     exampleSlug: "today-note",
-    summary: "짧은 하루 기록과 가족 일지를 남깁니다.",
+    summary: "하루의 감정과 기억을 짧게 남기고 최근 기록 흐름과 연결합니다.",
   },
   "school-timetable": {
     moduleKey: "school-timetable",
-    collectionLabel: "시간표 목록",
+    collectionLabel: "학교 시간표",
     itemLabel: "시간표",
-    createLabel: "새 시간표 추가",
+    createLabel: "시간표 추가",
     exampleSlug: "monday-pack",
-    summary: "학교와 학원 동선, 준비 메모를 관리합니다.",
+    summary: "요일·교시 중심 표와 준비물 메모로 학교 일정을 보기 쉽게 정리합니다.",
   },
   "day-planner": {
     moduleKey: "day-planner",
-    collectionLabel: "데이 플래너 목록",
+    collectionLabel: "하루 플래너",
     itemLabel: "플래너 블록",
-    createLabel: "새 플래너 추가",
+    createLabel: "플래너 블록 추가",
     exampleSlug: "morning-flow",
-    summary: "하루 블록과 시간 단위 계획을 정리합니다.",
+    summary: "아침, 오후, 저녁 흐름을 시간 블록으로 나눠 계획합니다.",
   },
   progress: {
     moduleKey: "progress",
-    collectionLabel: "목표 목록",
+    collectionLabel: "목표 보드",
     itemLabel: "목표",
     createLabel: "새 목표 만들기",
     exampleSlug: "reading-goal",
-    summary: "공동 목표와 진행률, 마일스톤을 추적합니다.",
+    summary: "진행률과 남은 분량, 달성 페이스를 크게 보여주는 목표형 보드입니다.",
   },
   habits: {
     moduleKey: "habits",
-    collectionLabel: "습관 목록",
-    itemLabel: "습관",
-    createLabel: "새 습관 만들기",
+    collectionLabel: "루틴 보드",
+    itemLabel: "루틴",
+    createLabel: "새 루틴 만들기",
     exampleSlug: "morning-routine",
-    summary: "반복 루틴과 연속 체크 흐름을 관리합니다.",
+    summary: "반복 습관과 실천 횟수를 루틴 흐름으로 관리합니다.",
   },
 };
 
@@ -139,6 +139,12 @@ export function buildFamilyEntryHref(familySlug: string): string {
 
 export function buildFamilyBuilderHref(familySlug: string): string {
   return `/console/families/${familySlug}`;
+}
+
+export function buildFamilyMobilePreviewHref(familySlug: string, screen?: string): string {
+  return screen
+    ? `/preview/mobile/${familySlug}?screen=${screen}`
+    : `/preview/mobile/${familySlug}`;
 }
 
 export function buildFamilyModuleHref(familySlug: string, moduleKey: ModuleKey): string {

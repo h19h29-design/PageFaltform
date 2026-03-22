@@ -25,19 +25,19 @@ export default async function NewHabitRoutinePage(props: NewHabitRoutinePageProp
   return (
     <div className="surface-stack">
       <SectionHeader
-        kicker="Tracker"
-        title="Create habit routine"
-        action={<StatusPill tone="accent">home-linked</StatusPill>}
+        kicker="루틴"
+        title="새 루틴 만들기"
+        action={<StatusPill tone="accent">홈 연결</StatusPill>}
       />
 
       <SurfaceCard
-        title="What this writes"
-        description="A new routine is saved to the tracker store, then the home progress band rebuilds from the same habit feed."
+        title="저장 후 반영"
+        description="루틴을 저장하면 루틴 보드와 가족 홈 진행 밴드가 함께 갱신됩니다."
       >
-        <ul className="stack-list">
-          <li>Detail route opens immediately after save.</li>
-          <li>Badge reflects the streak and metric reflects consistency.</li>
-          <li>Summary keeps completion, consistency, and streak in one sentence.</li>
+        <ul className="stack-list compact-list">
+          <li>저장 직후 상세 페이지가 열립니다.</li>
+          <li>유지율과 연속 일수가 카드에 바로 반영됩니다.</li>
+          <li>다음 체크 시각도 함께 기록됩니다.</li>
         </ul>
       </SurfaceCard>
 

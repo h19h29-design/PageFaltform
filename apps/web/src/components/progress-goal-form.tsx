@@ -15,16 +15,16 @@ type ProgressGoalFormProps = {
 };
 
 const audienceOptions = [
-  { value: "family-shared", label: "Family shared" },
-  { value: "personal", label: "Personal" },
+  { value: "family-shared", label: "가족 공용" },
+  { value: "personal", label: "개인" },
 ] as const;
 
 const visibilityOptions = [
-  { value: "all", label: "All members" },
-  { value: "children-safe", label: "Children safe" },
-  { value: "adults", label: "Adults" },
-  { value: "admins", label: "Admins" },
-  { value: "private", label: "Private" },
+  { value: "all", label: "전체" },
+  { value: "children-safe", label: "아이도 보기" },
+  { value: "adults", label: "성인만" },
+  { value: "admins", label: "관리자만" },
+  { value: "private", label: "비공개" },
 ] as const;
 
 export function ProgressGoalForm({ familySlug, mode, action, goal, errorMessage }: ProgressGoalFormProps) {
@@ -45,25 +45,25 @@ export function ProgressGoalForm({ familySlug, mode, action, goal, errorMessage 
 
         <div className="grid-two">
           <SurfaceCard
-            title={mode === "new" ? "New goal" : "Edit goal"}
-            description="Goal title, outcome, and progress numbers drive the same tracker card summary shown on home."
-            badge={<StatusPill tone="accent">{mode}</StatusPill>}
+            title={mode === "new" ? "새 목표 만들기" : "목표 수정"}
+            description="목표 이름과 달성 기준을 먼저 정하면 보드에서 바로 크게 보입니다."
+            badge={<StatusPill tone="accent">{mode === "new" ? "new" : "edit"}</StatusPill>}
           >
             <div className="form-stack">
               <label className="form-label">
-                Title
+                목표 이름
                 <input
                   className="text-input"
                   defaultValue={goal?.title ?? ""}
                   name="title"
-                  placeholder="Family reading challenge"
+                  placeholder="가족 독서 챌린지"
                   required
                   type="text"
                 />
               </label>
 
               <label className="form-label">
-                Slug
+                주소 슬러그
                 <input
                   className="text-input"
                   defaultValue={goal?.slug ?? ""}
@@ -74,23 +74,23 @@ export function ProgressGoalForm({ familySlug, mode, action, goal, errorMessage 
               </label>
 
               <label className="form-label">
-                Goal outcome
+                목표 설명
                 <textarea
                   className="text-input text-input--tall"
                   defaultValue={goal?.goalOutcome ?? ""}
                   name="goalOutcome"
-                  placeholder="Explain what success looks like when this goal is complete."
+                  placeholder="이 목표를 달성하면 어떤 상태가 되는지 적어주세요."
                   required
                 />
               </label>
 
               <label className="form-label">
-                Cadence label
+                기간 라벨
                 <input
                   className="text-input"
                   defaultValue={goal?.cadenceLabel ?? ""}
                   name="cadenceLabel"
-                  placeholder="This week"
+                  placeholder="이번 달"
                   required
                   type="text"
                 />
@@ -99,13 +99,13 @@ export function ProgressGoalForm({ familySlug, mode, action, goal, errorMessage 
           </SurfaceCard>
 
           <SurfaceCard
-            title="Progress metrics"
-            description="Badge and metric values are derived from current value, target value, and streak."
+            title="진행 수치"
+            description="현재 값과 목표 값을 크게 비교해 진행률이 바로 계산됩니다."
           >
             <div className="form-stack">
               <div className="grid-two">
                 <label className="form-label">
-                  Current value
+                  현재 값
                   <input
                     className="text-input"
                     defaultValue={goal?.currentValue ?? 0}
@@ -117,7 +117,7 @@ export function ProgressGoalForm({ familySlug, mode, action, goal, errorMessage 
                 </label>
 
                 <label className="form-label">
-                  Target value
+                  목표 값
                   <input
                     className="text-input"
                     defaultValue={goal?.targetValue ?? 1}
@@ -131,24 +131,24 @@ export function ProgressGoalForm({ familySlug, mode, action, goal, errorMessage 
 
               <div className="grid-two">
                 <label className="form-label">
-                  Metric label
+                  단위 이름
                   <input
                     className="text-input"
                     defaultValue={goal?.metricLabel ?? ""}
                     name="metricLabel"
-                    placeholder="pages"
+                    placeholder="읽은 페이지"
                     required
                     type="text"
                   />
                 </label>
 
                 <label className="form-label">
-                  Metric unit
+                  단위 표기
                   <input
                     className="text-input"
                     defaultValue={goal?.metricUnit ?? ""}
                     name="metricUnit"
-                    placeholder="p"
+                    placeholder="쪽"
                     type="text"
                   />
                 </label>
@@ -156,7 +156,7 @@ export function ProgressGoalForm({ familySlug, mode, action, goal, errorMessage 
 
               <div className="grid-two">
                 <label className="form-label">
-                  Streak days
+                  연속 일수
                   <input
                     className="text-input"
                     defaultValue={goal?.streakDays ?? 0}
@@ -168,7 +168,7 @@ export function ProgressGoalForm({ familySlug, mode, action, goal, errorMessage 
                 </label>
 
                 <label className="form-label">
-                  Due at
+                  마감 시각
                   <input
                     className="text-input"
                     defaultValue={toDateTimeLocalInputValue(goal?.dueAt)}
@@ -182,12 +182,12 @@ export function ProgressGoalForm({ familySlug, mode, action, goal, errorMessage 
         </div>
 
         <SurfaceCard
-          title="Card visibility"
-          description="Audience, visibility, and featured state control how the goal appears in the progress band."
+          title="보드 노출 방식"
+          description="공용 여부와 강조 여부에 따라 목표 보드와 홈의 진행 밴드 노출 순서가 달라집니다."
         >
           <div className="grid-two">
             <label className="form-label">
-              Audience
+              대상
               <select className="text-input" defaultValue={goal?.audience ?? "family-shared"} name="audience">
                 {audienceOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -198,7 +198,7 @@ export function ProgressGoalForm({ familySlug, mode, action, goal, errorMessage 
             </label>
 
             <label className="form-label">
-              Visibility
+              공개 범위
               <select className="text-input" defaultValue={goal?.visibilityScope ?? "all"} name="visibilityScope">
                 {visibilityOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -210,20 +210,20 @@ export function ProgressGoalForm({ familySlug, mode, action, goal, errorMessage 
           </div>
 
           <label className="form-label">
-            <span>Featured on the progress band</span>
+            <span>목표 보드 상단에 강조하기</span>
             <input defaultChecked={goal?.featured ?? false} name="featured" type="checkbox" value="true" />
           </label>
         </SurfaceCard>
 
         <div className="builder-save-row">
           <button className="button button--primary" type="submit">
-            {mode === "new" ? "Create goal" : "Save goal"}
+            {mode === "new" ? "목표 저장" : "목표 수정 저장"}
           </button>
           <Link className="button button--secondary" href={listHref}>
-            Back to goals
+            목표 보드로
           </Link>
           <Link className="button button--ghost" href={homeHref}>
-            Back to home
+            가족 홈으로
           </Link>
         </div>
       </form>

@@ -54,10 +54,7 @@ function SharedMetaFields(props: {
 }) {
   return (
     <div className="builder-grid">
-      <FieldShell
-        label="슬러그"
-        helper="비워 두면 제목으로 자동 생성합니다."
-      >
+      <FieldShell label="주소 슬러그" helper="비워두면 제목을 기준으로 자동 생성됩니다.">
         <input
           className="text-input"
           defaultValue={props.slug ?? ""}
@@ -67,7 +64,7 @@ function SharedMetaFields(props: {
         />
       </FieldShell>
 
-      <FieldShell label="카드 범위">
+      <FieldShell label="카드 대상">
         <select
           className="text-input"
           defaultValue={props.audience ?? "family-shared"}
@@ -81,7 +78,7 @@ function SharedMetaFields(props: {
         </select>
       </FieldShell>
 
-      <FieldShell label="노출 범위">
+      <FieldShell label="공개 범위">
         <select
           className="text-input"
           defaultValue={props.visibilityScope ?? "all"}
@@ -135,7 +132,7 @@ export function CalendarScheduleForm(props: {
       originalSlug={props.schedule?.slug}
       submitLabel={props.submitLabel}
     >
-      <FieldShell label="제목">
+      <FieldShell label="일정 제목" helper="예: 민서 치과 예약, 가족 외식, 학교 상담">
         <input
           className="text-input"
           defaultValue={props.schedule?.title ?? ""}
@@ -146,7 +143,7 @@ export function CalendarScheduleForm(props: {
       </FieldShell>
 
       <div className="builder-grid">
-        <FieldShell label="시작 시각">
+        <FieldShell label="시작 시간">
           <input
             className="text-input"
             defaultValue={
@@ -159,7 +156,7 @@ export function CalendarScheduleForm(props: {
           />
         </FieldShell>
 
-        <FieldShell label="종료 시각">
+        <FieldShell label="종료 시간">
           <input
             className="text-input"
             defaultValue={
@@ -179,7 +176,7 @@ export function CalendarScheduleForm(props: {
             className="text-input"
             defaultValue={props.schedule?.location ?? ""}
             name="location"
-            placeholder="도곡 치과"
+            placeholder="강남 치과"
             type="text"
           />
         </FieldShell>
@@ -203,8 +200,8 @@ export function CalendarScheduleForm(props: {
 
       <ToggleField
         defaultChecked={props.schedule?.affectsFamilyFlow ?? true}
-        helper="today 또는 focus 카드 후보에 반영됩니다."
-        label="가족 흐름에 영향"
+        helper="가족 홈의 오늘 카드나 보조 카드 계산에 반영됩니다."
+        label="가족 흐름에 반영"
         name="affectsFamilyFlow"
       />
     </FormFrame>
@@ -225,7 +222,7 @@ export function TodoItemForm(props: {
       originalSlug={props.todo?.slug}
       submitLabel={props.submitLabel}
     >
-      <FieldShell label="제목">
+      <FieldShell label="할 일 제목" helper="짧고 분명하게 적으면 체크리스트에서 더 잘 보입니다.">
         <input
           className="text-input"
           defaultValue={props.todo?.title ?? ""}
@@ -236,7 +233,7 @@ export function TodoItemForm(props: {
       </FieldShell>
 
       <div className="builder-grid">
-        <FieldShell label="마감 시각">
+        <FieldShell label="마감 시간">
           <input
             className="text-input"
             defaultValue={
@@ -266,23 +263,23 @@ export function TodoItemForm(props: {
         visibilityScope={props.todo?.visibilityScope}
       />
 
-      <div className="builder-option-grid">
+      <div className="builder-option-grid toggle-card-grid">
         <ToggleField
           defaultChecked={props.todo?.blocksFamilyFlow ?? true}
-          helper="홈 today/focus 우선순위 계산에 반영됩니다."
-          label="가족 흐름 blocker"
+          helper="가족 홈의 우선 카드 계산에 더 크게 반영됩니다."
+          label="중요 체크"
           name="blocksFamilyFlow"
         />
         <ToggleField
           defaultChecked={props.todo?.completed ?? false}
-          helper="완료된 항목은 홈 카드 후보에서 빠집니다."
-          label="완료됨"
+          helper="완료 항목으로 이동합니다."
+          label="완료 처리"
           name="completed"
         />
         <ToggleField
           defaultChecked={props.todo?.overdue ?? false}
-          helper="마감일보다 우선해서 지연 상태로 취급합니다."
-          label="강제 지연"
+          helper="강제로 지연 항목으로 분류하고 싶을 때 사용합니다."
+          label="지연으로 표시"
           name="overdue"
         />
       </div>
@@ -315,19 +312,19 @@ export function SchoolTimetableForm(props: {
           />
         </FieldShell>
 
-        <FieldShell label="제목">
+        <FieldShell label="수업 이름">
           <input
             className="text-input"
             defaultValue={props.schedule?.title ?? ""}
             name="title"
-            placeholder="영어 학원"
+            placeholder="영어 보충"
             type="text"
           />
         </FieldShell>
       </div>
 
       <div className="builder-grid">
-        <FieldShell label="시작 시각">
+        <FieldShell label="시작 시간">
           <input
             className="text-input"
             defaultValue={
@@ -340,7 +337,7 @@ export function SchoolTimetableForm(props: {
           />
         </FieldShell>
 
-        <FieldShell label="종료 시각">
+        <FieldShell label="종료 시간">
           <input
             className="text-input"
             defaultValue={
@@ -354,12 +351,15 @@ export function SchoolTimetableForm(props: {
         </FieldShell>
       </div>
 
-      <FieldShell label="준비 메모">
+      <FieldShell
+        label="준비물 메모"
+        helper="시간표 표 아래에 같이 보여줄 준비물, 복장, 알림을 적어둘 수 있습니다."
+      >
         <textarea
           className="text-input text-input--tall"
           defaultValue={props.schedule?.preparationNote ?? ""}
           name="preparationNote"
-          placeholder="체육복, 준비물 확인"
+          placeholder="체육복, 실내화, 영어 숙제책"
         />
       </FieldShell>
 
@@ -371,8 +371,8 @@ export function SchoolTimetableForm(props: {
 
       <ToggleField
         defaultChecked={props.schedule?.affectsFamilyFlow ?? true}
-        helper="등하교 또는 학원 동선에 영향을 주는 경우 켜 둡니다."
-        label="가족 동선에 영향"
+        helper="등하교 동선이나 준비물 챙김 흐름에 반영할 때 켭니다."
+        label="가족 준비 흐름에 반영"
         name="affectsFamilyFlow"
       />
     </FormFrame>
@@ -393,18 +393,18 @@ export function DayPlannerBlockForm(props: {
       originalSlug={props.block?.slug}
       submitLabel={props.submitLabel}
     >
-      <FieldShell label="제목">
+      <FieldShell label="블록 제목">
         <input
           className="text-input"
           defaultValue={props.block?.title ?? ""}
           name="title"
-          placeholder="저녁 준비와 픽업"
+          placeholder="등원 준비와 아침 식사"
           type="text"
         />
       </FieldShell>
 
       <div className="builder-grid">
-        <FieldShell label="시작 시각">
+        <FieldShell label="시작 시간">
           <input
             className="text-input"
             defaultValue={
@@ -417,7 +417,7 @@ export function DayPlannerBlockForm(props: {
           />
         </FieldShell>
 
-        <FieldShell label="종료 시각">
+        <FieldShell label="종료 시간">
           <input
             className="text-input"
             defaultValue={
@@ -449,8 +449,8 @@ export function DayPlannerBlockForm(props: {
 
       <ToggleField
         defaultChecked={props.block?.affectsFamilyFlow ?? true}
-        helper="today/focus 카드와 공동 시간 블록 계산에 반영됩니다."
-        label="핸드오프 영향"
+        helper="가족 홈의 오늘 흐름 카드에 반영합니다."
+        label="오늘 흐름에 반영"
         name="affectsFamilyFlow"
       />
     </FormFrame>

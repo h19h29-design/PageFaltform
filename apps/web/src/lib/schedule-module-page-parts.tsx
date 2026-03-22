@@ -29,10 +29,10 @@ export function ModuleNoticeCard(props: {
 
   return (
     <SurfaceCard
-      title={errorMessage ? "입력 확인이 필요합니다." : "변경이 반영되었습니다."}
+      title={errorMessage ? "입력 내용을 다시 확인해주세요" : "변경 내용이 반영되었습니다"}
       badge={
         <StatusPill tone={errorMessage ? "danger" : "accent"}>
-          {errorMessage ? "error" : "saved"}
+          {errorMessage ? "오류" : "완료"}
         </StatusPill>
       }
       tone={errorMessage ? "warm" : "accent"}

@@ -7,7 +7,9 @@ import { createAuthDataWriteService } from "@ysplan/database";
 import { createDefaultFamilyWorkspace } from "@ysplan/platform";
 
 import {
+  familyThemePresetOptions,
   getConsoleFamilyBySlug,
+  getFamilyThemePresetTheme,
   resetRuntimeFamilyWorkspace,
   saveRuntimeFamilyWorkspace,
   type RuntimeFamilyRecord,
@@ -24,6 +26,7 @@ function revalidateFamilyPaths(familySlug: string) {
   revalidatePath(`/console/families/${familySlug}`);
   revalidatePath(`/f/${familySlug}`);
   revalidatePath(`/app/${familySlug}`);
+  revalidatePath(`/preview/mobile/${familySlug}`);
 }
 
 function parseEnabledModules(formData: FormData): string[] {
@@ -33,12 +36,22 @@ function parseEnabledModules(formData: FormData): string[] {
     .filter(Boolean);
 }
 
+function parseThemePreset(formData: FormData) {
+  const selected = String(formData.get("themePreset") ?? "").trim();
+
+  return (
+    familyThemePresetOptions.find((preset) => preset.key === selected)?.key ??
+    familyThemePresetOptions[0]!.key
+  );
+}
+
 async function mirrorFamilyWorkspaceToDatabase(input: {
   family: RuntimeFamilyRecord;
   updatedByUserId: string;
   enabledModules: string[];
   homePreset: "balanced" | "planner" | "story";
   entryPreset: "guided" | "direct";
+  themePreset: (typeof familyThemePresetOptions)[number]["key"];
 }): Promise<void> {
   if (isDatabaseSourceOfTruthEnabled() || !isDbAuthBaselineEnabled()) {
     return;
@@ -61,7 +74,7 @@ async function mirrorFamilyWorkspaceToDatabase(input: {
         memberCount: input.family.memberCount,
         createdByUserId: input.family.ownerUserId ?? input.updatedByUserId,
         customDomains: input.family.customDomains,
-        theme: input.family.theme,
+        theme: getFamilyThemePresetTheme(input.themePreset),
         accessPolicy: {
           mode: input.family.accessPolicy.mode,
           secret: input.family.accessPolicy.secret,
@@ -99,6 +112,7 @@ export async function saveFamilyWorkspaceAction(formData: FormData) {
   }
 
   const enabledModules = parseEnabledModules(formData);
+  const themePreset = parseThemePreset(formData);
   const homePreset =
     String(formData.get("homePreset") ?? "") === "planner"
       ? "planner"
@@ -113,6 +127,7 @@ export async function saveFamilyWorkspaceAction(formData: FormData) {
     enabledModules,
     homePreset,
     entryPreset,
+    themePreset,
     updatedByUserId: consoleSession.userId,
   });
 
@@ -122,6 +137,7 @@ export async function saveFamilyWorkspaceAction(formData: FormData) {
     enabledModules,
     homePreset,
     entryPreset,
+    themePreset,
   });
 
   revalidateFamilyPaths(familyAccess.family.slug);
@@ -142,10 +158,7 @@ export async function resetFamilyWorkspaceAction(formData: FormData) {
     redirect("/console");
   }
 
-  await resetRuntimeFamilyWorkspace(
-    familyAccess.family.slug,
-    consoleSession.userId,
-  );
+  await resetRuntimeFamilyWorkspace(familyAccess.family.slug, consoleSession.userId);
   const defaultWorkspace = createDefaultFamilyWorkspace(
     familyAccess.family.slug,
     familyAccess.family.enabledModules,
@@ -156,6 +169,7 @@ export async function resetFamilyWorkspaceAction(formData: FormData) {
     enabledModules: defaultWorkspace.enabledModules,
     homePreset: defaultWorkspace.homePreset,
     entryPreset: defaultWorkspace.entryPreset,
+    themePreset: defaultWorkspace.themePreset,
   });
   revalidateFamilyPaths(familyAccess.family.slug);
   redirect(`/console/families/${familyAccess.family.slug}?state=reset`);

@@ -52,6 +52,8 @@ export type FamilyHomePreset = "balanced" | "planner" | "story";
 
 export type FamilyEntryPreset = "guided" | "direct";
 
+export type FamilyThemePreset = "garden" | "sunset" | "sky";
+
 export interface FamilyPresetOption<TPreset extends string> {
   key: TPreset;
   label: string;
@@ -63,6 +65,7 @@ export interface FamilyWorkspaceDraft {
   enabledModules: ModuleKey[];
   homePreset: FamilyHomePreset;
   entryPreset: FamilyEntryPreset;
+  themePreset: FamilyThemePreset;
   updatedAt: string;
 }
 
@@ -462,6 +465,7 @@ export function createDefaultFamilyWorkspace(
     enabledModules: normalizeModuleKeys(enabledModules),
     homePreset: "balanced",
     entryPreset: "guided",
+    themePreset: "garden",
     updatedAt: now.toISOString()
   };
 }
@@ -489,6 +493,12 @@ export function resolveFamilyWorkspace(input: {
         ? override.homePreset
         : baseDraft.homePreset,
     entryPreset: override.entryPreset === "direct" ? "direct" : baseDraft.entryPreset,
+    themePreset:
+      override.themePreset === "sunset" || override.themePreset === "sky"
+        ? override.themePreset
+        : override.themePreset === "garden"
+          ? "garden"
+          : baseDraft.themePreset,
     updatedAt: override.updatedAt ?? baseDraft.updatedAt
   };
 }

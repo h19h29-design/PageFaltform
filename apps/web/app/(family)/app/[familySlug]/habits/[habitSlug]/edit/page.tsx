@@ -33,17 +33,17 @@ export default async function EditHabitRoutinePage(props: EditHabitRoutinePagePr
   return (
     <div className="surface-stack">
       <SectionHeader
-        kicker="Tracker"
-        title={`Edit ${habit.title}`}
-        action={<StatusPill tone="accent">live edit</StatusPill>}
+        kicker="루틴"
+        title={`${habit.title} 수정`}
+        action={<StatusPill tone="accent">실시간 반영</StatusPill>}
       />
 
       <SurfaceCard
-        title="Edit behavior"
-        description="Saving keeps the same detail route pattern and immediately refreshes the habit card used on home."
+        title="수정 시 반영"
+        description="저장하면 같은 상세 경로를 유지한 채 카드 수치가 즉시 갱신됩니다."
       >
         <p className="card-meta">
-          Last updated {formatTrackerDateTime(habit.updatedAt, familyAppView.workspaceView.family.timezone)}
+          마지막 수정 {formatTrackerDateTime(habit.updatedAt, familyAppView.workspaceView.family.timezone)}
         </p>
       </SurfaceCard>
 
@@ -56,15 +56,15 @@ export default async function EditHabitRoutinePage(props: EditHabitRoutinePagePr
       />
 
       <SurfaceCard
-        title="Delete habit"
-        description="If this routine is no longer relevant, remove it here and the home progress band will drop the card."
-        badge={<StatusPill tone="danger">destructive</StatusPill>}
+        title="루틴 삭제"
+        description="더 이상 쓰지 않는 루틴이라면 여기서 바로 정리할 수 있습니다."
+        badge={<StatusPill tone="danger">주의</StatusPill>}
       >
         <form action={deleteHabitRoutineAction} className="inline-actions">
           <input name="familySlug" type="hidden" value={familySlug} />
           <input name="currentSlug" type="hidden" value={habit.slug} />
           <button className="button button--ghost" type="submit">
-            Delete habit
+            루틴 삭제
           </button>
         </form>
       </SurfaceCard>

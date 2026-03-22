@@ -27,7 +27,7 @@ type ProgressListPageProps = {
 function getStateMessage(state?: string) {
   switch (state) {
     case "deleted":
-      return "목표가 삭제되었고, 홈의 진행 상황 밴드에도 바로 반영됩니다.";
+      return "목표가 삭제되었고, 가족 홈의 진행 밴드에서도 바로 빠졌습니다.";
     default:
       return null;
   }
@@ -76,7 +76,7 @@ export default async function ProgressListPage(props: ProgressListPageProps) {
 
       <SectionHeader
         kicker="목표"
-        title="목표 게시판"
+        title="목표 보드"
         action={
           <div className="inline-actions">
             {!moduleEnabled ? <StatusPill tone="warm">홈에서는 꺼짐</StatusPill> : null}
@@ -92,33 +92,34 @@ export default async function ProgressListPage(props: ProgressListPageProps) {
 
       <div className="grid-two">
         <SurfaceCard
-          title="반영 상태"
-          description="이 목록은 가족 홈의 진행 상황 밴드와 같은 목표 builder 결과를 그대로 사용합니다."
-          badge={<StatusPill tone="accent">{feed.cards.length}장</StatusPill>}
+          title="진행 현황"
+          description="목표 달성률과 연속 기록이 크게 보이도록 정리했습니다."
+          badge={<StatusPill tone="accent">{feed.cards.length}개</StatusPill>}
+          tone="accent"
         >
           <MetricList
             items={[
               { label: "평균 달성률", value: formatPercent(feed.meta.averageCompletionRate) },
               { label: "최장 연속", value: `${feed.meta.longestStreakDays}일` },
-              { label: "마감 임박", value: `${feed.meta.dueSoonCount}` },
-              { label: "가족 공용", value: `${feed.meta.sharedGoalCount}` },
+              { label: "마감 임박", value: `${feed.meta.dueSoonCount}개` },
+              { label: "가족 공용", value: `${feed.meta.sharedGoalCount}개` },
             ]}
           />
         </SurfaceCard>
 
         <SurfaceCard
-          title="카드 규칙"
-          description="배지는 달성률, 요약은 진행 흐름과 연속 기록을 담고, 마감 임박 목표가 진행 밴드 위로 올라옵니다."
+          title="보드 읽는 법"
+          description="설명은 줄이고, 사용자에게 필요한 수치와 상태를 더 크게 보여줍니다."
         >
-          <ul className="stack-list">
-            <li>홈 카드에서는 `cardType: progress` 와 `sectionHint: progress` 를 유지합니다.</li>
-            <li>점수가 비슷하면 가족 공용 목표가 개인 목표보다 먼저 올라옵니다.</li>
-            <li>여기서 수정하면 상세 페이지와 홈 진행 밴드가 바로 바뀝니다.</li>
+          <ul className="stack-list compact-list">
+            <li>제일 큰 숫자는 달성률입니다.</li>
+            <li>현재값과 목표값을 바로 비교할 수 있습니다.</li>
+            <li>연속 기록과 마감일은 우측 하단 메타로 정리합니다.</li>
           </ul>
         </SurfaceCard>
       </div>
 
-      <div className="surface-stack">
+      <div className="surface-stack tracker-board">
         {orderedCards.map(({ goal, card }) => (
           <SurfaceCard
             key={goal.id}
@@ -135,13 +136,19 @@ export default async function ProgressListPage(props: ProgressListPageProps) {
                 </Link>
               </div>
             }
+            className="tracker-card tracker-card--goal"
           >
+            <div className="tracker-card__hero">
+              <strong>{formatPercent(card.metricValue)}</strong>
+              <span>{goal.goalOutcome}</span>
+            </div>
+
             <MetricList
               items={[
-                { label: "달성률", value: formatPercent(card.metricValue) },
                 { label: "현재값", value: formatCount(goal.currentValue, goal.metricUnit) },
                 { label: "목표값", value: formatCount(goal.targetValue, goal.metricUnit) },
-                { label: "연속 기록", value: `${goal.streakDays}일` },
+                { label: "주기", value: goal.cadenceLabel },
+                { label: "연속", value: `${goal.streakDays}일` },
               ]}
             />
 

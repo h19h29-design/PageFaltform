@@ -7,6 +7,7 @@ import {
 import { getModuleDescriptors } from "@ysplan/tenant";
 
 import {
+  familyThemePresetOptions,
   getStoredWorkspaceDraft,
   listConsoleFamilies,
   resolveRuntimeFamilyFromSlug,
@@ -22,6 +23,8 @@ export interface EffectiveFamilyWorkspace {
   homePresetDescription: string;
   entryPresetLabel: string;
   entryPresetDescription: string;
+  themePresetLabel: string;
+  themePresetDescription: string;
   moduleDescriptors: ReturnType<typeof getModuleDescriptors>;
 }
 
@@ -36,15 +39,24 @@ export function buildEffectiveFamilyWorkspace(
   });
   const homePreset = getFamilyHomePresetOption(workspace.homePreset);
   const entryPreset = getFamilyEntryPresetOption(workspace.entryPreset);
+  const themePreset =
+    familyThemePresetOptions.find((option) => option.key === workspace.themePreset) ??
+    familyThemePresetOptions[0]!;
+  const effectiveFamily: RuntimeFamilyRecord = {
+    ...family,
+    theme: workspaceDraft ? { ...themePreset.theme } : family.theme,
+  };
 
   return {
-    family,
+    family: effectiveFamily,
     workspace,
     isCustomized: Boolean(workspaceDraft),
     homePresetLabel: homePreset.label,
     homePresetDescription: homePreset.description,
     entryPresetLabel: entryPreset.label,
     entryPresetDescription: entryPreset.description,
+    themePresetLabel: themePreset.label,
+    themePresetDescription: themePreset.description,
     moduleDescriptors: getModuleDescriptors(workspace.enabledModules),
   };
 }
@@ -85,7 +97,7 @@ export function getFamilyWorkspaceSummary(workspace: EffectiveFamilyWorkspace): 
     .map((module) => module.label)
     .join(", ");
 
-  return `${workspace.homePresetLabel} · ${workspace.entryPresetLabel} · ${
+  return `${workspace.homePresetLabel} · ${workspace.entryPresetLabel} · ${workspace.themePresetLabel} · ${
     topModules || "기본 모듈"
   }`;
 }

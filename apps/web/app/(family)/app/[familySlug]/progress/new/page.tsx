@@ -25,19 +25,19 @@ export default async function NewProgressGoalPage(props: NewProgressGoalPageProp
   return (
     <div className="surface-stack">
       <SectionHeader
-        kicker="Tracker"
-        title="Create progress goal"
-        action={<StatusPill tone="accent">home-linked</StatusPill>}
+        kicker="목표"
+        title="새 목표 만들기"
+        action={<StatusPill tone="accent">홈 연결</StatusPill>}
       />
 
       <SurfaceCard
-        title="What this writes"
-        description="A new goal record is saved to the tracker store, then the home progress band rebuilds from the same module feed."
+        title="저장 후 반영"
+        description="목표를 저장하면 목표 보드와 가족 홈의 진행 밴드가 함께 갱신됩니다."
       >
-        <ul className="stack-list">
-          <li>Detail route opens immediately after save.</li>
-          <li>Badge shows attainment percent from current and target values.</li>
-          <li>Summary stays aligned with cadence, remaining gap, and streak.</li>
+        <ul className="stack-list compact-list">
+          <li>저장 직후 상세 페이지가 열립니다.</li>
+          <li>달성률이 자동 계산되어 큰 숫자로 보입니다.</li>
+          <li>연속 일수와 마감일도 함께 반영됩니다.</li>
         </ul>
       </SurfaceCard>
 

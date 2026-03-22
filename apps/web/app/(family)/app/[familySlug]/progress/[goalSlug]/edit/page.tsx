@@ -33,17 +33,17 @@ export default async function EditProgressGoalPage(props: EditProgressGoalPagePr
   return (
     <div className="surface-stack">
       <SectionHeader
-        kicker="Tracker"
-        title={`Edit ${goal.title}`}
-        action={<StatusPill tone="accent">live edit</StatusPill>}
+        kicker="목표"
+        title={`${goal.title} 수정`}
+        action={<StatusPill tone="accent">실시간 반영</StatusPill>}
       />
 
       <SurfaceCard
-        title="Edit behavior"
-        description="Saving keeps the same detail route pattern and immediately refreshes the tracker card used on home."
+        title="수정 시 반영"
+        description="저장하면 같은 상세 경로를 유지한 채 카드 수치가 즉시 갱신됩니다."
       >
         <p className="card-meta">
-          Last updated {formatTrackerDateTime(goal.updatedAt, familyAppView.workspaceView.family.timezone)}
+          마지막 수정 {formatTrackerDateTime(goal.updatedAt, familyAppView.workspaceView.family.timezone)}
         </p>
       </SurfaceCard>
 
@@ -56,15 +56,15 @@ export default async function EditProgressGoalPage(props: EditProgressGoalPagePr
       />
 
       <SurfaceCard
-        title="Delete goal"
-        description="If this goal is no longer relevant, remove it here and the home progress band will drop the card."
-        badge={<StatusPill tone="danger">destructive</StatusPill>}
+        title="목표 삭제"
+        description="더 이상 쓰지 않는 목표라면 여기서 바로 정리할 수 있습니다."
+        badge={<StatusPill tone="danger">주의</StatusPill>}
       >
         <form action={deleteProgressGoalAction} className="inline-actions">
           <input name="familySlug" type="hidden" value={familySlug} />
           <input name="currentSlug" type="hidden" value={goal.slug} />
           <button className="button button--ghost" type="submit">
-            Delete goal
+            목표 삭제
           </button>
         </form>
       </SurfaceCard>

@@ -27,9 +27,9 @@ type ProgressDetailPageProps = {
 function getStateMessage(state?: string) {
   switch (state) {
     case "created":
-      return "The goal was created and is now available on both the tracker page and the home progress band.";
+      return "목표가 만들어졌고 가족 홈의 진행 밴드에도 바로 반영되었습니다.";
     case "updated":
-      return "The goal was updated and the refreshed card metadata is ready on home.";
+      return "목표가 수정되었고 보드 카드도 함께 갱신되었습니다.";
     default:
       return null;
   }
@@ -73,80 +73,80 @@ export default async function ProgressDetailPage(props: ProgressDetailPageProps)
       ) : null}
 
       <HeroCard
-        eyebrow="Progress detail"
+        eyebrow="목표 상세"
         title={goal.title}
         subtitle={card.summary}
         meta={
           <>
             <StatusPill tone="accent">{card.badge}</StatusPill>
             <StatusPill>{formatPercent(card.metricValue)}</StatusPill>
-            <StatusPill tone="warm">{goal.streakDays} day streak</StatusPill>
+            <StatusPill tone="warm">{goal.streakDays}일 연속</StatusPill>
           </>
         }
         actions={
           <div className="inline-actions">
             <Link className="button button--secondary" href={buildFamilyModuleEditHref(familySlug, "progress", goal.slug)}>
-              Edit
+              수정
             </Link>
             <Link className="button button--ghost" href={buildFamilyModuleHref(familySlug, "progress")}>
-              Back to list
+              목록
             </Link>
             <Link className="button button--ghost" href={buildFamilyHomeHref(familySlug)}>
-              Home
+              홈
             </Link>
           </div>
         }
       >
-        <SurfaceCard title="Home card preview" description="This is the same score-bearing card payload that the progress band consumes." tone="accent">
+        <SurfaceCard title="보드 카드 요약" description="가족 홈 진행 밴드에 들어가는 핵심 수치입니다." tone="accent">
           <MetricList
             items={[
-              { label: "Priority", value: `${card.priority}` },
-              { label: "Completion", value: formatPercent(card.metricValue) },
-              { label: "Due", value: formatTrackerDateTime(goal.dueAt, familyAppView.workspaceView.family.timezone) },
-              { label: "Section", value: card.sectionHint ?? "progress" },
+              { label: "우선순위", value: `${card.priority}` },
+              { label: "달성률", value: formatPercent(card.metricValue) },
+              { label: "마감", value: formatTrackerDateTime(goal.dueAt, familyAppView.workspaceView.family.timezone) },
+              { label: "구역", value: card.sectionHint ?? "progress" },
             ]}
           />
         </SurfaceCard>
       </HeroCard>
 
       <div className="grid-two">
-        <SurfaceCard title="Goal metrics" description="Numbers here drive the attainment badge and remaining-gap summary.">
+        <SurfaceCard title="목표 수치" description="달성률 계산에 직접 쓰이는 값입니다.">
           <MetricList
             items={[
-              { label: "Current", value: formatCount(goal.currentValue, goal.metricUnit) },
-              { label: "Target", value: formatCount(goal.targetValue, goal.metricUnit) },
-              { label: "Metric label", value: goal.metricLabel },
-              { label: "Cadence", value: goal.cadenceLabel },
+              { label: "현재값", value: formatCount(goal.currentValue, goal.metricUnit) },
+              { label: "목표값", value: formatCount(goal.targetValue, goal.metricUnit) },
+              { label: "단위 이름", value: goal.metricLabel },
+              { label: "기간", value: goal.cadenceLabel },
             ]}
           />
         </SurfaceCard>
 
-        <SurfaceCard title="Visibility" description="Audience and visibility stay contract-safe for the dashboard feed.">
+        <SurfaceCard title="노출 상태" description="가족 공용 여부와 공개 범위를 함께 봅니다.">
           <MetricList
             items={[
-              { label: "Audience", value: formatAudienceLabel(goal.audience) },
-              { label: "Visibility", value: formatVisibilityLabel(goal.visibilityScope) },
-              { label: "Featured", value: goal.featured ? "Yes" : "No" },
-              { label: "Updated", value: formatTrackerDateTime(goal.updatedAt, familyAppView.workspaceView.family.timezone) },
+              { label: "대상", value: formatAudienceLabel(goal.audience) },
+              { label: "공개 범위", value: formatVisibilityLabel(goal.visibilityScope) },
+              { label: "강조 여부", value: goal.featured ? "예" : "아니오" },
+              { label: "수정 시각", value: formatTrackerDateTime(goal.updatedAt, familyAppView.workspaceView.family.timezone) },
             ]}
           />
         </SurfaceCard>
       </div>
 
-      <SurfaceCard title="Outcome" description={goal.goalOutcome} />
+      <SurfaceCard title="목표 설명" description={goal.goalOutcome} />
 
       <section className="surface-stack">
-        <SectionHeader kicker="Danger zone" title="Delete goal" />
+        <SectionHeader kicker="삭제" title="이 목표 삭제하기" />
         <SurfaceCard
-          title="Remove this goal"
-          description="Deleting the goal removes it from the list and from the progress band on home."
-          badge={<StatusPill tone="danger">destructive</StatusPill>}
+          title="삭제하면 어떻게 되나요?"
+          description="목표 보드와 가족 홈 진행 밴드에서 즉시 빠집니다."
+          badge={<StatusPill tone="danger">주의</StatusPill>}
         >
           <form action={deleteProgressGoalAction} className="inline-actions">
             <input name="familySlug" type="hidden" value={familySlug} />
             <input name="currentSlug" type="hidden" value={goal.slug} />
             <button className="button button--ghost" type="submit">
-              Delete goal
+              목표 삭제
             </button>
           </form>
         </SurfaceCard>

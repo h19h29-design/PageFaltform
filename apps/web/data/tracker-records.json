@@ -3,7 +3,7 @@
   "metadata": {
     "backend": "file",
     "migrationTarget": "postgres",
-    "lastWriteAt": "2026-03-21T02:21:50.913Z"
+    "lastWriteAt": "2026-03-22T05:02:44.558Z"
   },
   "families": {
     "mini-seoul": {
@@ -243,6 +243,113 @@
           "createdAt": "2026-03-21T01:30:20.020Z",
           "updatedAt": "2026-03-21T01:30:20.020Z",
           "nextCheckInAt": "2026-03-19T13:00:00.000Z"
+        }
+      ]
+    },
+    "park": {
+      "progressGoals": [
+        {
+          "id": "spring-trip-fund",
+          "slug": "spring-trip-fund",
+          "audience": "family-shared",
+          "visibilityScope": "all",
+          "title": "봄 가족여행 적립",
+          "goalOutcome": "주말 가족여행 예산 준비가 완료됩니다.",
+          "currentValue": 720000,
+          "targetValue": 1000000,
+          "metricLabel": "적립금",
+          "metricUnit": "원",
+          "cadenceLabel": "이번 달",
+          "streakDays": 5,
+          "dueAt": "2026-03-31T21:00:00+09:00",
+          "featured": true,
+          "createdAt": "2026-03-22T05:02:44.557Z",
+          "updatedAt": "2026-03-22T05:02:44.557Z"
+        },
+        {
+          "id": "reading-challenge",
+          "slug": "reading-challenge",
+          "audience": "family-shared",
+          "visibilityScope": "children-safe",
+          "title": "가족 독서 챌린지",
+          "goalOutcome": "이번 주 공동 독서 챌린지를 완주합니다.",
+          "currentValue": 18,
+          "targetValue": 24,
+          "metricLabel": "읽은 책",
+          "metricUnit": "권",
+          "cadenceLabel": "이번 주",
+          "streakDays": 8,
+          "dueAt": "2026-03-22T20:30:00+09:00",
+          "createdAt": "2026-03-22T05:02:44.557Z",
+          "updatedAt": "2026-03-22T05:02:44.557Z"
+        },
+        {
+          "id": "mina-piano-board",
+          "slug": "mina-piano-board",
+          "audience": "personal",
+          "visibilityScope": "children-safe",
+          "title": "민아 피아노 연습판",
+          "goalOutcome": "이번 주 연습 스티커 보드를 모두 채웁니다.",
+          "currentValue": 7,
+          "targetValue": 10,
+          "metricLabel": "연습 횟수",
+          "metricUnit": "회",
+          "cadenceLabel": "이번 주",
+          "streakDays": 3,
+          "dueAt": "2026-03-23T19:00:00+09:00",
+          "createdAt": "2026-03-22T05:02:44.557Z",
+          "updatedAt": "2026-03-22T05:02:44.557Z"
+        }
+      ],
+      "habitRoutines": [
+        {
+          "id": "evening-walk",
+          "slug": "evening-walk",
+          "audience": "family-shared",
+          "visibilityScope": "all",
+          "title": "저녁 산책 루틴",
+          "periodLabel": "이번 주",
+          "habitBenefit": "오늘 20분만 걸으면 저녁 루틴을 안정적으로 이어갑니다.",
+          "completionCount": 6,
+          "targetCount": 7,
+          "consistencyRate": 91,
+          "streakDays": 14,
+          "nextCheckInAt": "2026-03-19T20:10:00+09:00",
+          "featured": true,
+          "createdAt": "2026-03-22T05:02:44.557Z",
+          "updatedAt": "2026-03-22T05:02:44.557Z"
+        },
+        {
+          "id": "water-before-school",
+          "slug": "water-before-school",
+          "audience": "family-shared",
+          "visibilityScope": "children-safe",
+          "title": "등교 전 물 챙기기",
+          "periodLabel": "이번 주",
+          "habitBenefit": "아침 준비 흐름을 가볍게 유지하는 기본 루틴입니다.",
+          "completionCount": 7,
+          "targetCount": 7,
+          "consistencyRate": 88,
+          "streakDays": 9,
+          "nextCheckInAt": "2026-03-20T07:10:00+09:00",
+          "createdAt": "2026-03-22T05:02:44.557Z",
+          "updatedAt": "2026-03-22T05:02:44.557Z"
+        },
+        {
+          "id": "mom-stretching",
+          "slug": "mom-stretching",
+          "audience": "personal",
+          "visibilityScope": "adults",
+          "title": "엄마 밤 스트레칭",
+          "periodLabel": "이번 주",
+          "habitBenefit": "잠들기 전 정리 루틴을 놓치지 않게 도와줍니다.",
+          "completionCount": 4,
+          "targetCount": 5,
+          "consistencyRate": 82,
+          "streakDays": 11,
+          "nextCheckInAt": "2026-03-19T22:00:00+09:00",
+          "createdAt": "2026-03-22T05:02:44.557Z",
+          "updatedAt": "2026-03-22T05:02:44.557Z"
         }
       ]
     }

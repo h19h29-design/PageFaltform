@@ -15,6 +15,7 @@ import {
   resolveFamilyWorkspace,
   type FamilyEntryPreset,
   type FamilyHomePreset,
+  type FamilyThemePreset,
   type FamilyWorkspaceDraft,
 } from "@ysplan/platform";
 import {
@@ -78,7 +79,7 @@ interface LegacyFamilySiteStore {
   workspaceDrafts: Record<string, FamilyWorkspaceDraft>;
 }
 
-export type FamilyThemePresetKey = "garden" | "sunset" | "sky";
+export type FamilyThemePresetKey = FamilyThemePreset;
 
 export const familyThemePresetOptions: Array<{
   key: FamilyThemePresetKey;
@@ -170,6 +171,7 @@ function cloneWorkspaceDraft(draft: FamilyWorkspaceDraft): FamilyWorkspaceDraft 
     enabledModules: [...draft.enabledModules],
     homePreset: draft.homePreset,
     entryPreset: draft.entryPreset,
+    themePreset: draft.themePreset,
     updatedAt: draft.updatedAt,
   };
 }
@@ -213,6 +215,12 @@ function sanitizeWorkspaceDraft(
     homePreset:
       value.homePreset === "planner" || value.homePreset === "story" ? value.homePreset : "balanced",
     entryPreset: value.entryPreset === "direct" ? "direct" : "guided",
+    themePreset:
+      value.themePreset === "sunset" || value.themePreset === "sky"
+        ? value.themePreset
+        : value.themePreset === "garden"
+          ? "garden"
+          : "garden",
     updatedAt: typeof value.updatedAt === "string" ? value.updatedAt : new Date(0).toISOString(),
   };
 }
@@ -403,8 +411,34 @@ function createEntryChecklist(mode: FamilyAccessMode): FamilyTenantRecord["entry
   ];
 }
 
-function getThemePreset(key: FamilyThemePresetKey): FamilyTheme {
-  return familyThemePresetOptions.find((preset) => preset.key === key)?.theme ?? familyThemePresetOptions[0]!.theme;
+export function getFamilyThemePresetTheme(key: FamilyThemePresetKey): FamilyTheme {
+  const presetTheme =
+    familyThemePresetOptions.find((preset) => preset.key === key)?.theme ??
+    familyThemePresetOptions[0]!.theme;
+
+  return {
+    ...presetTheme,
+  };
+}
+
+export function resolveFamilyThemePresetKey(theme: FamilyTheme): FamilyThemePresetKey {
+  const normalizedAccent = theme.accentColor.toLowerCase();
+  const normalizedWarm = theme.warmColor.toLowerCase();
+  const normalizedSurface = theme.surfaceColor.toLowerCase();
+  const normalizedHighlight = theme.highlightColor.toLowerCase();
+
+  return (
+    familyThemePresetOptions.find((preset) => {
+      const presetTheme = preset.theme;
+
+      return (
+        presetTheme.accentColor.toLowerCase() === normalizedAccent &&
+        presetTheme.warmColor.toLowerCase() === normalizedWarm &&
+        presetTheme.surfaceColor.toLowerCase() === normalizedSurface &&
+        presetTheme.highlightColor.toLowerCase() === normalizedHighlight
+      );
+    })?.key ?? "garden"
+  );
 }
 
 function hasDatabaseSourceOfTruth(): boolean {
@@ -484,6 +518,14 @@ function toWorkspaceDraftFromDatabase(
     return null;
   }
 
+  const fallbackTheme = familyThemePresetOptions[0]!.theme;
+  const resolvedThemePreset = resolveFamilyThemePresetKey({
+    accentColor: family.theme?.accentColor ?? fallbackTheme.accentColor,
+    warmColor: family.theme?.warmColor ?? fallbackTheme.warmColor,
+    surfaceColor: family.theme?.surfaceColor ?? fallbackTheme.surfaceColor,
+    highlightColor: family.theme?.highlightColor ?? fallbackTheme.highlightColor,
+  });
+
   return {
     familySlug: family.slug,
     enabledModules:
@@ -492,6 +534,7 @@ function toWorkspaceDraftFromDatabase(
         : (normalizeModuleKeys(DEFAULT_DB_MODULES) as FamilyWorkspaceDraft["enabledModules"]),
     homePreset: family.workspace.homePreset,
     entryPreset: family.workspace.entryPreset,
+    themePreset: resolvedThemePreset,
     updatedAt: family.workspace.updatedAt,
   };
 }
@@ -611,6 +654,7 @@ export async function saveRuntimeFamilyWorkspace(input: {
   enabledModules: string[];
   homePreset: FamilyHomePreset;
   entryPreset: FamilyEntryPreset;
+  themePreset: FamilyThemePresetKey;
   updatedByUserId?: string | null;
 }): Promise<FamilyWorkspaceDraft> {
   const draft = resolveFamilyWorkspace({
@@ -621,6 +665,7 @@ export async function saveRuntimeFamilyWorkspace(input: {
       enabledModules: input.enabledModules,
       homePreset: input.homePreset,
       entryPreset: input.entryPreset,
+      themePreset: input.themePreset,
       updatedAt: new Date().toISOString(),
     },
   });
@@ -722,6 +767,7 @@ export async function createCustomFamilySite(input: {
       enabledModules: input.enabledModules,
       homePreset: input.homePreset,
       entryPreset: input.entryPreset,
+      themePreset: input.themePreset,
       updatedAt: now,
     },
   });
@@ -758,7 +804,7 @@ export async function createCustomFamilySite(input: {
       enabledModuleLabels: moduleLabels,
     }),
     entryChecklist: createEntryChecklist(input.accessMode),
-    theme: getThemePreset(input.themePreset),
+    theme: getFamilyThemePresetTheme(input.themePreset),
     accessPolicy: createAccessPolicy(input.accessMode, accessSecret),
     ownerUserId: input.ownerUserId,
     createdAt: now,

@@ -115,7 +115,7 @@ export async function createHabitRoutineAction(formData: FormData) {
       throw error;
     }
 
-    const message = error instanceof Error ? error.message : "Could not create the habit.";
+    const message = error instanceof Error ? error.message : "루틴을 만들지 못했습니다.";
     redirect(`${buildFamilyModuleNewHref(familySlug, "habits")}?error=${encodeURIComponent(message)}`);
   }
 }
@@ -130,7 +130,7 @@ export async function updateHabitRoutineAction(formData: FormData) {
     const habit = await updateHabitRoutine(familySlug, currentSlug, buildHabitDraft(formData));
 
     if (!habit) {
-      redirect(`${buildFamilyModuleHref(familySlug, "habits")}?error=Habit%20not%20found`);
+      redirect(`${buildFamilyModuleHref(familySlug, "habits")}?error=${encodeURIComponent("루틴을 찾지 못했습니다.")}`);
     }
 
     revalidateHabitPaths(familySlug, currentSlug);
@@ -141,7 +141,7 @@ export async function updateHabitRoutineAction(formData: FormData) {
       throw error;
     }
 
-    const message = error instanceof Error ? error.message : "Could not save the habit.";
+    const message = error instanceof Error ? error.message : "루틴을 저장하지 못했습니다.";
     redirect(`${buildFamilyModuleEditHref(familySlug, "habits", currentSlug)}?error=${encodeURIComponent(message)}`);
   }
 }

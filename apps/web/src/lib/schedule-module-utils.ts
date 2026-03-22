@@ -9,12 +9,12 @@ export const audienceOptions: Array<{
   {
     value: "family-shared",
     label: "가족 공용",
-    description: "홈 today 카드와 가족 공용 목록 후보에 먼저 들어갑니다.",
+    description: "가족 홈의 오늘 카드와 공용 목록에 우선 반영됩니다.",
   },
   {
     value: "personal",
     label: "개인",
-    description: "가족 흐름에 영향을 줄 때만 focus 보조 카드 후보가 됩니다.",
+    description: "개인 기록으로 저장되고, 필요할 때만 보조 카드에 나타납니다.",
   },
 ];
 
@@ -124,7 +124,7 @@ export function parseDateTimeInputValue(value: string, timezone: string): string
   const match = value.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/);
 
   if (!match) {
-    throw new Error("날짜와 시간을 다시 확인해 주세요.");
+    throw new Error("날짜와 시간을 다시 확인해주세요.");
   }
 
   const [, year, month, day, hour, minute] = match;

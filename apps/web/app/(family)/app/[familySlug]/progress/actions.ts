@@ -116,7 +116,7 @@ export async function createProgressGoalAction(formData: FormData) {
       throw error;
     }
 
-    const message = error instanceof Error ? error.message : "Could not create the goal.";
+    const message = error instanceof Error ? error.message : "목표를 만들지 못했습니다.";
     redirect(`${buildFamilyModuleNewHref(familySlug, "progress")}?error=${encodeURIComponent(message)}`);
   }
 }
@@ -131,7 +131,7 @@ export async function updateProgressGoalAction(formData: FormData) {
     const goal = await updateProgressGoal(familySlug, currentSlug, buildProgressDraft(formData));
 
     if (!goal) {
-      redirect(`${buildFamilyModuleHref(familySlug, "progress")}?error=Goal%20not%20found`);
+      redirect(`${buildFamilyModuleHref(familySlug, "progress")}?error=${encodeURIComponent("목표를 찾지 못했습니다.")}`);
     }
 
     revalidateProgressPaths(familySlug, currentSlug);
@@ -142,7 +142,7 @@ export async function updateProgressGoalAction(formData: FormData) {
       throw error;
     }
 
-    const message = error instanceof Error ? error.message : "Could not save the goal.";
+    const message = error instanceof Error ? error.message : "목표를 저장하지 못했습니다.";
     redirect(
       `${buildFamilyModuleEditHref(familySlug, "progress", currentSlug)}?error=${encodeURIComponent(message)}`,
     );

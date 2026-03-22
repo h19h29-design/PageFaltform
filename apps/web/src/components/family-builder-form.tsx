@@ -8,6 +8,7 @@ import {
   familyHomePresetOptions,
   type FamilyEntryPreset,
   type FamilyHomePreset,
+  type FamilyThemePreset,
   type FamilyWorkspaceDraft,
 } from "@ysplan/platform";
 import { StatusPill, SurfaceCard } from "@ysplan/ui";
@@ -16,6 +17,11 @@ type FamilyBuilderFormProps = {
   familyName: string;
   moduleCatalog: ModuleDescriptor[];
   initialDraft: FamilyWorkspaceDraft;
+  themeOptions: Array<{
+    key: FamilyThemePreset;
+    label: string;
+    description: string;
+  }>;
 };
 
 function moveItem(moduleKeys: ModuleKey[], fromKey: ModuleKey, toKey: ModuleKey): ModuleKey[] {
@@ -40,9 +46,11 @@ export function FamilyBuilderForm({
   familyName,
   moduleCatalog,
   initialDraft,
+  themeOptions,
 }: FamilyBuilderFormProps) {
   const [homePreset, setHomePreset] = useState<FamilyHomePreset>(initialDraft.homePreset);
   const [entryPreset, setEntryPreset] = useState<FamilyEntryPreset>(initialDraft.entryPreset);
+  const [themePreset, setThemePreset] = useState<FamilyThemePreset>(initialDraft.themePreset);
   const [draggingKey, setDraggingKey] = useState<ModuleKey | null>(null);
   const [moduleOrder, setModuleOrder] = useState<ModuleKey[]>(
     moduleCatalog.map((module) => module.key),
@@ -87,11 +95,12 @@ export function FamilyBuilderForm({
     <div className="builder-grid">
       <input name="homePreset" type="hidden" value={homePreset} />
       <input name="entryPreset" type="hidden" value={entryPreset} />
+      <input name="themePreset" type="hidden" value={themePreset} />
       <input name="enabledModules" type="hidden" value={orderedEnabledModules.join(",")} />
 
       <SurfaceCard
         title="홈 프리셋"
-        description={`${familyName} 홈 첫 화면을 어떤 성격으로 보여 줄지 선택합니다.`}
+        description={`${familyName} 첫 화면에서 어떤 정보가 먼저 보일지 정합니다.`}
         badge={<StatusPill tone="accent">{homePreset}</StatusPill>}
       >
         <div className="builder-option-grid">
@@ -111,7 +120,7 @@ export function FamilyBuilderForm({
 
       <SurfaceCard
         title="입장 흐름"
-        description="입구 페이지에서 가족 분위기를 먼저 보여 줄지, 바로 비밀번호 확인으로 들어갈지 정합니다."
+        description="가족 입구에서 안내를 먼저 보여줄지, 바로 비밀번호 확인으로 보낼지 정합니다."
         badge={<StatusPill>{entryPreset}</StatusPill>}
       >
         <div className="builder-option-grid builder-option-grid--compact">
@@ -130,10 +139,30 @@ export function FamilyBuilderForm({
       </SurfaceCard>
 
       <SurfaceCard
+        title="테마 프리셋"
+        description="배경 톤과 강조색을 한 번에 바꿔 가족마다 다른 분위기를 줄 수 있습니다."
+        badge={<StatusPill tone="warm">{themePreset}</StatusPill>}
+      >
+        <div className="builder-option-grid builder-option-grid--compact">
+          {themeOptions.map((option) => (
+            <button
+              key={option.key}
+              className={`builder-option theme-option${themePreset === option.key ? " builder-option--active" : ""}`}
+              onClick={() => setThemePreset(option.key)}
+              type="button"
+            >
+              <strong>{option.label}</strong>
+              <span>{option.description}</span>
+            </button>
+          ))}
+        </div>
+      </SurfaceCard>
+
+      <SurfaceCard
         className="builder-stack-card"
-        title="모듈 스택"
-        description="체크박스로 켜고 끄고, 드래그나 위·아래 버튼으로 홈 노출 순서를 바꿀 수 있습니다."
-        badge={<StatusPill tone="warm">{orderedEnabledModules.length} enabled</StatusPill>}
+        title="모듈 구성"
+        description="체크해서 켜고 끄고, 드래그나 위아래 버튼으로 실제 노출 순서를 조정합니다."
+        badge={<StatusPill tone="warm">{orderedEnabledModules.length}개 사용 중</StatusPill>}
       >
         {orderedEnabledModules.length > 0 ? (
           <div className="pill-row">
@@ -149,7 +178,7 @@ export function FamilyBuilderForm({
           </div>
         ) : (
           <div className="builder-empty">
-            최소 한 개 모듈은 켜 두는 편이 좋습니다. 모두 끄더라도 저장 시 기본 모듈이 다시 들어옵니다.
+            최소 한 개 이상의 모듈은 켜두는 편이 좋습니다. 모두 꺼도 저장은 되지만 첫 화면이 많이 비어 보일 수 있습니다.
           </div>
         )}
 
@@ -209,15 +238,15 @@ export function FamilyBuilderForm({
                     >
                       아래로
                     </button>
-                    <span className="builder-module__handle" aria-hidden="true">
+                    <span aria-hidden="true" className="builder-module__handle">
                       drag
                     </span>
                   </div>
                 </div>
 
                 <div className="builder-module__meta">
-                  <span>홈 순서 {index + 1}</span>
-                  <span>{isEnabled ? "활성화됨" : "비활성화됨"}</span>
+                  <span>노출 순서 {index + 1}</span>
+                  <span>{isEnabled ? "사용 중" : "꺼짐"}</span>
                 </div>
               </li>
             );
