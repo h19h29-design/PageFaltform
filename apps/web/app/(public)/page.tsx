@@ -27,9 +27,9 @@ const flowStages = [
 ];
 
 export default async function LandingPage() {
-  const families = await listPublicFamilyPreviews();
-  const demoUsers = listDemoConsoleUsers();
   const consoleSession = await getActivePlatformUserSession();
+  const families = await listPublicFamilyPreviews(consoleSession);
+  const demoUsers = listDemoConsoleUsers();
   const moduleLabelByKey = new Map(coreModules.map((module) => [module.key, module.label]));
 
   return (

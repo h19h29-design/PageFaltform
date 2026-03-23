@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import {
   createPlatformUserSession,
   normalizeEmail,
+  type PlatformAccountRole,
   type PlatformMembership,
   type PlatformUserSession,
 } from "@ysplan/auth";
@@ -29,7 +30,10 @@ export interface LocalPlatformUserRecord {
   displayName: string;
   email: string;
   passwordHash: string;
+  platformRole: PlatformAccountRole;
   memberships: PlatformMembership[];
+  approvedToFullMemberAt: string | null;
+  approvedToFullMemberByUserId: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -47,6 +51,14 @@ function createEmptyLocalPlatformAuthStore(): LocalPlatformAuthStore {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function sanitizePlatformRole(value: unknown): PlatformAccountRole {
+  if (value === "master" || value === "full-member") {
+    return value;
+  }
+
+  return "associate-member";
 }
 
 function sanitizeMembership(value: unknown): PlatformMembership | null {
@@ -111,7 +123,14 @@ function sanitizeLocalPlatformUserRecord(
     displayName: value.displayName.trim(),
     email: normalizeEmail(value.email),
     passwordHash: value.passwordHash,
+    platformRole: sanitizePlatformRole(value.platformRole),
     memberships: sanitizeMemberships(value.memberships),
+    approvedToFullMemberAt:
+      typeof value.approvedToFullMemberAt === "string" ? value.approvedToFullMemberAt : null,
+    approvedToFullMemberByUserId:
+      typeof value.approvedToFullMemberByUserId === "string"
+        ? value.approvedToFullMemberByUserId
+        : null,
     createdAt: value.createdAt,
     updatedAt: value.updatedAt,
   };
@@ -122,7 +141,10 @@ function cloneUserRecord(
 ): LocalPlatformUserRecord {
   return {
     ...user,
+    platformRole: user.platformRole,
     memberships: user.memberships.map((membership) => ({ ...membership })),
+    approvedToFullMemberAt: user.approvedToFullMemberAt,
+    approvedToFullMemberByUserId: user.approvedToFullMemberByUserId,
   };
 }
 
@@ -202,10 +224,25 @@ export async function findLocalPlatformUserByEmail(
   return user ? cloneUserRecord(user) : null;
 }
 
+export async function findLocalPlatformUserById(
+  userId: string,
+): Promise<LocalPlatformUserRecord | null> {
+  const store = await readLocalPlatformAuthStore();
+  const user = store.users.find((candidate) => candidate.id === userId) ?? null;
+
+  return user ? cloneUserRecord(user) : null;
+}
+
+export async function listLocalPlatformUsers(): Promise<LocalPlatformUserRecord[]> {
+  const store = await readLocalPlatformAuthStore();
+  return store.users.map((user) => cloneUserRecord(user));
+}
+
 export async function createLocalPlatformUserRecord(input: {
   displayName: string;
   email: string;
   passwordHash: string;
+  platformRole?: PlatformAccountRole;
   memberships?: PlatformMembership[];
 }): Promise<LocalPlatformUserRecord> {
   const store = await readLocalPlatformAuthStore();
@@ -221,7 +258,10 @@ export async function createLocalPlatformUserRecord(input: {
     displayName: input.displayName.trim(),
     email: normalizedEmail,
     passwordHash: input.passwordHash,
+    platformRole: input.platformRole ?? "associate-member",
     memberships: (input.memberships ?? []).map((membership) => ({ ...membership })),
+    approvedToFullMemberAt: null,
+    approvedToFullMemberByUserId: null,
     createdAt: now,
     updatedAt: now,
   };
@@ -232,6 +272,58 @@ export async function createLocalPlatformUserRecord(input: {
   return cloneUserRecord(nextUser);
 }
 
+export async function setLocalPlatformUserRole(input: {
+  userId: string;
+  platformRole: PlatformAccountRole;
+  approvedByUserId?: string | null;
+}): Promise<LocalPlatformUserRecord> {
+  const store = await readLocalPlatformAuthStore();
+  const user = store.users.find((candidate) => candidate.id === input.userId);
+
+  if (!user) {
+    throw new Error("user-not-found");
+  }
+
+  const now = new Date().toISOString();
+  user.platformRole = input.platformRole;
+  user.updatedAt = now;
+
+  if (input.platformRole === "full-member") {
+    user.approvedToFullMemberAt = now;
+    user.approvedToFullMemberByUserId = input.approvedByUserId ?? null;
+  }
+
+  await writeLocalPlatformAuthStore(store);
+  return cloneUserRecord(user);
+}
+
+export async function grantLocalPlatformMembership(input: {
+  userId: string;
+  membership: PlatformMembership;
+}): Promise<LocalPlatformUserRecord> {
+  const store = await readLocalPlatformAuthStore();
+  const user = store.users.find((candidate) => candidate.id === input.userId);
+
+  if (!user) {
+    throw new Error("user-not-found");
+  }
+
+  const existingMembershipIndex = user.memberships.findIndex(
+    (membership) => membership.familySlug === input.membership.familySlug,
+  );
+
+  if (existingMembershipIndex >= 0) {
+    user.memberships[existingMembershipIndex] = { ...input.membership };
+  } else {
+    user.memberships.push({ ...input.membership });
+  }
+
+  user.updatedAt = new Date().toISOString();
+  await writeLocalPlatformAuthStore(store);
+
+  return cloneUserRecord(user);
+}
+
 export function createLocalPlatformSession(
   user: LocalPlatformUserRecord,
 ): PlatformUserSession {
@@ -239,7 +331,7 @@ export function createLocalPlatformSession(
     userId: user.id,
     displayName: user.displayName,
     email: user.email,
+    platformRole: user.platformRole,
     memberships: user.memberships.map((membership) => ({ ...membership })),
   });
 }
-

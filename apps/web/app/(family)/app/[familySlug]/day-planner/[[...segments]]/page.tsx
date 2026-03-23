@@ -51,9 +51,9 @@ function buildDayPlannerFooter(
         <StatusPill>{formatAudienceLabel(block.audience)}</StatusPill>
         <StatusPill>{formatVisibilityScopeLabel(block.visibilityScope)}</StatusPill>
         {block.ownerLabel ? <StatusPill>{block.ownerLabel}</StatusPill> : null}
-        {block.affectsFamilyFlow ? <StatusPill tone="accent">handoff</StatusPill> : null}
-        {todaySlugs.has(block.slug) ? <StatusPill tone="accent">today</StatusPill> : null}
-        {isFocus ? <StatusPill tone="warm">focus</StatusPill> : null}
+        {block.affectsFamilyFlow ? <StatusPill tone="accent">인계</StatusPill> : null}
+        {todaySlugs.has(block.slug) ? <StatusPill tone="accent">오늘</StatusPill> : null}
+        {isFocus ? <StatusPill tone="warm">집중</StatusPill> : null}
       </div>
       <div className="inline-actions">
         <Link className="button button--secondary button--small" href={`/app/${familySlug}/day-planner/${block.slug}`}>

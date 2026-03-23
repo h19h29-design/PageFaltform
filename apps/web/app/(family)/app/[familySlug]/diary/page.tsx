@@ -1,8 +1,8 @@
 import Link from "next/link";
 
-import { MetricList, SectionHeader, StatusPill } from "@ysplan/ui";
+import { MetricList, SectionHeader, StatusPill, SurfaceCard } from "@ysplan/ui";
 
-import { ContentMessageCard, ContentRecordCard } from "src/components/content-module-shell";
+import { ContentMessageCard } from "src/components/content-module-shell";
 import { FamilyAppShell } from "src/components/family-app-shell";
 import {
   buildFamilyHomeHref,
@@ -13,7 +13,9 @@ import {
 } from "src/lib/family-app-routes";
 import { getContentCrudMessage, getContentErrorMessage } from "src/lib/content-modules";
 import {
+  getContentAudienceLabel,
   getContentRecordUpdatedLabel,
+  getContentVisibilityLabel,
   getDiaryBadgeLabel,
   listDiaryRecords,
 } from "src/lib/content-store";
@@ -37,6 +39,8 @@ export default async function DiaryPage(props: DiaryPageProps) {
     return null;
   }
 
+  const highlightedRecord = records.find((record) => record.highlighted) ?? records[0] ?? null;
+
   return (
     <FamilyAppShell
       actions={
@@ -50,8 +54,8 @@ export default async function DiaryPage(props: DiaryPageProps) {
         </div>
       }
       canManage={canManage}
-      subtitle={spec.summary}
-      title="일기 목록"
+      subtitle="짧은 기록도 부담 없이 쌓이도록, 일기장을 타임라인처럼 읽게 만든 조용한 기록 보드입니다."
+      title="일기장"
       viewerRole={viewerRole}
       workspaceView={workspaceView}
     >
@@ -59,43 +63,69 @@ export default async function DiaryPage(props: DiaryPageProps) {
       {errorMessage ? <ContentMessageCard title="다시 확인해 주세요" tone="warm">{errorMessage}</ContentMessageCard> : null}
 
       <div className="grid-two">
-        <ContentRecordCard
-          badge={<StatusPill tone="accent">{records.length} entries</StatusPill>}
-          description="일기는 별도 cardType 없이 recent/post 계열로 어댑트되지만, moduleKey는 diary로 유지됩니다."
+        <SurfaceCard
           title="일기 현황"
+          description="개인 기록과 가족 공유 기록을 나눠서 보되, 전체 흐름은 타임라인으로 읽을 수 있게 구성했습니다."
+          badge={<StatusPill tone="accent">{records.length}건</StatusPill>}
           tone="accent"
         >
           <MetricList
             items={[
-              { label: "개인 기록", value: `${records.filter((record) => record.audience === "personal").length}건` },
               { label: "가족 공유", value: `${records.filter((record) => record.audience === "family-shared").length}건` },
-              { label: "highlighted", value: `${records.filter((record) => record.highlighted).length}건` },
-              { label: "private", value: `${records.filter((record) => record.visibilityScope === "private").length}건` },
+              { label: "개인 기록", value: `${records.filter((record) => record.audience === "personal").length}건` },
+              { label: "강조 기록", value: `${records.filter((record) => record.highlighted).length}건` },
+              { label: "비공개", value: `${records.filter((record) => record.visibilityScope === "private").length}건` },
             ]}
           />
-        </ContentRecordCard>
+        </SurfaceCard>
 
-        <ContentRecordCard
-          badge={<StatusPill tone="warm">quiet recent</StatusPill>}
-          description="일기는 글보다 조용한 recent 흐름을 유지하고, mood badge와 visibility를 그대로 보존합니다."
-          title="recent 어댑터"
+        <SurfaceCard
+          title="보드 읽는 법"
+          description="일기장은 빠르게 넘겨보되, 남겨둘 감정과 분위기가 흐르도록 여백을 조금 더 줬습니다."
+          badge={<StatusPill tone="warm">조용한 흐름</StatusPill>}
           tone="warm"
         >
-          <ul className="stack-list">
-            <li>badge는 moodLabel 또는 기록/일기 성격을 그대로 보여 줍니다.</li>
-            <li>visibilityScope와 audience는 홈/상세/목록에서 그대로 유지됩니다.</li>
-            <li>홈에서 누르면 실제 일기 상세 페이지로 이동합니다.</li>
+          <ul className="stack-list compact-list">
+            <li>강조 기록은 상단에서 먼저 읽고, 이후 기록은 시간 흐름대로 이어집니다.</li>
+            <li>배지는 기록의 분위기만 짧게 알려 주고 본문은 간결하게 보여 줍니다.</li>
+            <li>공개 범위와 대상은 하단 메타로 정리해 시선이 분산되지 않게 했습니다.</li>
           </ul>
-        </ContentRecordCard>
+        </SurfaceCard>
       </div>
 
+      {highlightedRecord ? (
+        <SurfaceCard
+          title={highlightedRecord.title}
+          description={highlightedRecord.excerpt}
+          eyebrow="오늘의 기록"
+          badge={<StatusPill tone="accent">{getDiaryBadgeLabel(highlightedRecord)}</StatusPill>}
+          tone="accent"
+          footer={
+            <div className="inline-actions">
+              <Link className="button button--secondary button--small" href={buildFamilyModuleDetailHref(familySlug, "diary", highlightedRecord.slug)}>
+                상세
+              </Link>
+              <Link className="button button--ghost button--small" href={buildFamilyModuleEditHref(familySlug, "diary", highlightedRecord.slug)}>
+                수정
+              </Link>
+            </div>
+          }
+        >
+          <p className="feature-copy">{highlightedRecord.body}</p>
+        </SurfaceCard>
+      ) : null}
+
       <section className="surface-stack">
-        <SectionHeader kicker="Diary" title="전체 일기" action={<StatusPill>{records.length} entries</StatusPill>} />
+        <SectionHeader
+          kicker="일기장"
+          title="기록 타임라인"
+          action={<StatusPill>{records.length}건</StatusPill>}
+        />
 
         {records.length === 0 ? (
-          <ContentRecordCard
-            description="첫 일기를 작성하면 recent 카드와 상세 페이지가 함께 열립니다."
+          <SurfaceCard
             title="아직 등록된 일기가 없습니다."
+            description="첫 일기를 작성하면 가족 홈 recent 흐름과 상세 페이지가 함께 열립니다."
             footer={
               <Link className="button button--secondary" href={buildFamilyModuleNewHref(familySlug, "diary")}>
                 첫 일기 작성
@@ -103,13 +133,14 @@ export default async function DiaryPage(props: DiaryPageProps) {
             }
           />
         ) : (
-          <div className="route-card-grid">
+          <div className="journal-timeline">
             {records.map((record) => (
-              <ContentRecordCard
+              <SurfaceCard
                 key={record.id}
-                badge={<StatusPill tone={record.highlighted ? "accent" : "neutral"}>{getDiaryBadgeLabel(record)}</StatusPill>}
+                title={record.title}
                 description={record.excerpt}
-                eyebrow={record.highlighted ? "Highlighted diary" : "Diary"}
+                eyebrow={record.highlighted ? "강조 기록" : "기록"}
+                badge={<StatusPill tone={record.highlighted ? "accent" : "neutral"}>{getDiaryBadgeLabel(record)}</StatusPill>}
                 footer={
                   <div className="inline-actions">
                     <Link className="button button--secondary button--small" href={buildFamilyModuleDetailHref(familySlug, "diary", record.slug)}>
@@ -120,16 +151,16 @@ export default async function DiaryPage(props: DiaryPageProps) {
                     </Link>
                   </div>
                 }
-                title={record.title}
-                tone={record.highlighted ? "accent" : "default"}
+                className="journal-entry"
+                {...(record.highlighted ? { tone: "accent" as const } : {})}
               >
-                <p className="feature-copy">{record.body}</p>
+                <p className="journal-entry__excerpt">{record.body}</p>
                 <div className="pill-row">
-                  <StatusPill>{record.visibilityScope}</StatusPill>
-                  <StatusPill>{record.audience}</StatusPill>
+                  <StatusPill>{getContentAudienceLabel(record.audience)}</StatusPill>
+                  <StatusPill>{getContentVisibilityLabel(record.visibilityScope)}</StatusPill>
                   <StatusPill>{getContentRecordUpdatedLabel(record.updatedAt)}</StatusPill>
                 </div>
-              </ContentRecordCard>
+              </SurfaceCard>
             ))}
           </div>
         )}

@@ -12,7 +12,13 @@ import {
   getFamilyModuleRouteSpec,
 } from "src/lib/family-app-routes";
 import { getContentCrudMessage } from "src/lib/content-modules";
-import { getContentRecordUpdatedLabel, getDiaryBadgeLabel, getDiaryRecord } from "src/lib/content-store";
+import {
+  getContentAudienceLabel,
+  getContentRecordUpdatedLabel,
+  getContentVisibilityLabel,
+  getDiaryBadgeLabel,
+  getDiaryRecord,
+} from "src/lib/content-store";
 import { requireFamilyAppAccess } from "src/lib/family-app-context";
 
 type DiaryDetailPageProps = {
@@ -53,14 +59,14 @@ export default async function DiaryDetailPage(props: DiaryDetailPageProps) {
       {message ? <ContentMessageCard title="저장 완료" tone="accent">{message}</ContentMessageCard> : null}
 
       <HeroCard
-        eyebrow="Diary detail"
+        eyebrow="일기 상세"
         title={record.title}
         subtitle={record.excerpt}
         meta={
           <>
             <StatusPill tone={record.highlighted ? "accent" : "neutral"}>{getDiaryBadgeLabel(record)}</StatusPill>
-            {record.highlighted ? <StatusPill tone="warm">highlighted</StatusPill> : null}
-            <StatusPill>{record.visibilityScope}</StatusPill>
+            {record.highlighted ? <StatusPill tone="warm">강조 기록</StatusPill> : null}
+            <StatusPill>{getContentVisibilityLabel(record.visibilityScope)}</StatusPill>
           </>
         }
       >
@@ -68,7 +74,7 @@ export default async function DiaryDetailPage(props: DiaryDetailPageProps) {
           <MetricList
             items={[
               { label: "최근 수정", value: getContentRecordUpdatedLabel(record.updatedAt) },
-              { label: "대상", value: record.audience },
+              { label: "대상", value: getContentAudienceLabel(record.audience) },
               { label: "배지", value: getDiaryBadgeLabel(record) },
               { label: "슬러그", value: record.slug },
             ]}
@@ -83,10 +89,10 @@ export default async function DiaryDetailPage(props: DiaryDetailPageProps) {
 
         <SurfaceCard title="메타" description="home recent와 목록에서 사용하는 정보">
           <ul className="stack-list">
-            <li>노출 범위: {record.visibilityScope}</li>
-            <li>대상: {record.audience}</li>
+            <li>노출 범위: {getContentVisibilityLabel(record.visibilityScope)}</li>
+            <li>대상: {getContentAudienceLabel(record.audience)}</li>
             <li>무드 배지: {getDiaryBadgeLabel(record)}</li>
-            <li>highlighted: {record.highlighted ? "예" : "아니오"}</li>
+            <li>강조 기록: {record.highlighted ? "예" : "아니오"}</li>
           </ul>
         </SurfaceCard>
       </div>

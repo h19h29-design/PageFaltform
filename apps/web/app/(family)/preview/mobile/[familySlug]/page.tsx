@@ -17,10 +17,10 @@ type MobilePreviewPageProps = {
 };
 
 const mobileScreens = [
-  { key: "home", label: "홈", resolveHref: (familySlug: string) => buildFamilyHomeHref(familySlug) },
+  { key: "home", label: "가족 홈", resolveHref: (familySlug: string) => buildFamilyHomeHref(familySlug) },
   { key: "announcements", label: "공지", resolveHref: (familySlug: string) => buildFamilyModuleHref(familySlug, "announcements") },
   { key: "calendar", label: "일정", resolveHref: (familySlug: string) => buildFamilyModuleHref(familySlug, "calendar") },
-  { key: "todo", label: "체크리스트", resolveHref: (familySlug: string) => buildFamilyModuleHref(familySlug, "todo") },
+  { key: "todo", label: "할 일", resolveHref: (familySlug: string) => buildFamilyModuleHref(familySlug, "todo") },
   { key: "school-timetable", label: "시간표", resolveHref: (familySlug: string) => buildFamilyModuleHref(familySlug, "school-timetable") },
   { key: "progress", label: "목표", resolveHref: (familySlug: string) => buildFamilyModuleHref(familySlug, "progress") },
 ] as const;
@@ -41,7 +41,7 @@ export default async function MobilePreviewPage(props: MobilePreviewPageProps) {
   return (
     <div className="family-scene" style={createFamilySceneStyle(workspaceView.family.theme)}>
       <PageShell
-        eyebrow="Mobile Preview"
+        eyebrow="모바일 미리보기"
         title={`${workspaceView.family.name} 모바일 미리보기`}
         subtitle="데스크톱에서 휴대폰 화면 비율로 홈과 게시판을 빠르게 점검할 수 있는 전용 주소입니다."
         actions={

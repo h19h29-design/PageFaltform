@@ -60,6 +60,9 @@ export function FamilyBuilderForm({
   );
 
   const orderedEnabledModules = moduleOrder.filter((moduleKey) => enabledModules.has(moduleKey));
+  const selectedHomePreset = familyHomePresetOptions.find((option) => option.key === homePreset);
+  const selectedEntryPreset = familyEntryPresetOptions.find((option) => option.key === entryPreset);
+  const selectedThemePreset = themeOptions.find((option) => option.key === themePreset);
 
   function handleToggleModule(moduleKey: ModuleKey) {
     setEnabledModules((current) => {
@@ -101,7 +104,7 @@ export function FamilyBuilderForm({
       <SurfaceCard
         title="홈 프리셋"
         description={`${familyName} 첫 화면에서 어떤 정보가 먼저 보일지 정합니다.`}
-        badge={<StatusPill tone="accent">{homePreset}</StatusPill>}
+        badge={<StatusPill tone="accent">{selectedHomePreset?.label ?? homePreset}</StatusPill>}
       >
         <div className="builder-option-grid">
           {familyHomePresetOptions.map((option) => (
@@ -121,7 +124,7 @@ export function FamilyBuilderForm({
       <SurfaceCard
         title="입장 흐름"
         description="가족 입구에서 안내를 먼저 보여줄지, 바로 비밀번호 확인으로 보낼지 정합니다."
-        badge={<StatusPill>{entryPreset}</StatusPill>}
+        badge={<StatusPill>{selectedEntryPreset?.label ?? entryPreset}</StatusPill>}
       >
         <div className="builder-option-grid builder-option-grid--compact">
           {familyEntryPresetOptions.map((option) => (
@@ -141,7 +144,7 @@ export function FamilyBuilderForm({
       <SurfaceCard
         title="테마 프리셋"
         description="배경 톤과 강조색을 한 번에 바꿔 가족마다 다른 분위기를 줄 수 있습니다."
-        badge={<StatusPill tone="warm">{themePreset}</StatusPill>}
+        badge={<StatusPill tone="warm">{selectedThemePreset?.label ?? themePreset}</StatusPill>}
       >
         <div className="builder-option-grid builder-option-grid--compact">
           {themeOptions.map((option) => (
@@ -239,7 +242,7 @@ export function FamilyBuilderForm({
                       아래로
                     </button>
                     <span aria-hidden="true" className="builder-module__handle">
-                      drag
+                      드래그
                     </span>
                   </div>
                 </div>

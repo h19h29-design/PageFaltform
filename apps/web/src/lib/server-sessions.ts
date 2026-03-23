@@ -17,6 +17,10 @@ import {
   parsePlatformUserSession,
   PLATFORM_USER_COOKIE,
 } from "./session-cookies";
+import {
+  createLocalPlatformSession,
+  findLocalPlatformUserById,
+} from "./local-platform-auth";
 
 export interface AuthDataCutoverPath {
   key: "console-create-save" | "family-access-session";
@@ -122,7 +126,13 @@ export async function getActivePlatformUserSession(): Promise<PlatformUserSessio
     }
   }
 
-  return isPlatformUserSessionActive(session) ? session : null;
+  if (!isPlatformUserSessionActive(session)) {
+    return null;
+  }
+
+  const localUser = await findLocalPlatformUserById(session.userId);
+
+  return localUser ? createLocalPlatformSession(localUser) : session;
 }
 
 export async function getActiveConsoleSession(): Promise<PlatformUserSession | null> {
@@ -136,11 +146,11 @@ export async function getActiveConsoleSession(): Promise<PlatformUserSession | n
 }
 
 export async function getActiveConsoleSessionForFamily(
-  familySlug: string,
+  _familySlug: string,
 ): Promise<PlatformUserSession | null> {
   const session = await getActiveConsoleSession();
 
-  if (!session || !canAccessConsole(session, familySlug)) {
+  if (!session) {
     return null;
   }
 

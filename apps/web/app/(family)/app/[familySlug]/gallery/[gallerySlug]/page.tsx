@@ -12,7 +12,12 @@ import {
   getFamilyModuleRouteSpec,
 } from "src/lib/family-app-routes";
 import { getContentCrudMessage } from "src/lib/content-modules";
-import { getContentRecordUpdatedLabel, getGalleryRecord } from "src/lib/content-store";
+import {
+  getContentAudienceLabel,
+  getContentRecordUpdatedLabel,
+  getContentVisibilityLabel,
+  getGalleryRecord,
+} from "src/lib/content-store";
 import { requireFamilyAppAccess } from "src/lib/family-app-context";
 
 type GalleryDetailPageProps = {
@@ -53,14 +58,14 @@ export default async function GalleryDetailPage(props: GalleryDetailPageProps) {
       {message ? <ContentMessageCard title="저장 완료" tone="accent">{message}</ContentMessageCard> : null}
 
       <HeroCard
-        eyebrow="Gallery detail"
+        eyebrow="앨범 상세"
         title={record.title}
         subtitle={record.caption}
         meta={
           <>
             <StatusPill tone={record.featured ? "accent" : "neutral"}>{record.photoCount}장</StatusPill>
-            {record.featured ? <StatusPill tone="warm">featured</StatusPill> : null}
-            <StatusPill>{record.visibilityScope}</StatusPill>
+            {record.featured ? <StatusPill tone="warm">대표 앨범</StatusPill> : null}
+            <StatusPill>{getContentVisibilityLabel(record.visibilityScope)}</StatusPill>
           </>
         }
       >
@@ -83,8 +88,8 @@ export default async function GalleryDetailPage(props: GalleryDetailPageProps) {
 
         <SurfaceCard title="메타" description="recent 카드와 목록에서 사용하는 정보">
           <ul className="stack-list">
-            <li>노출 범위: {record.visibilityScope}</li>
-            <li>대상: {record.audience}</li>
+            <li>노출 범위: {getContentVisibilityLabel(record.visibilityScope)}</li>
+            <li>대상: {getContentAudienceLabel(record.audience)}</li>
             <li>대표 이미지: {record.imageUrl ?? "-"}</li>
             <li>메모 수: {record.noteCount ?? 0}개</li>
           </ul>

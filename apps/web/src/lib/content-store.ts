@@ -768,6 +768,28 @@ export function getDiaryBadgeLabel(record: Pick<StoredDiaryEntry, "moodLabel" | 
   return record.moodLabel ?? (record.highlighted ? "기록" : "일기");
 }
 
+export function getContentAudienceLabel(audience: string): string {
+  switch (audience) {
+    case "personal":
+      return "개인";
+    default:
+      return "가족 공용";
+  }
+}
+
+export function getContentVisibilityLabel(visibilityScope: string): string {
+  switch (visibilityScope) {
+    case "private":
+      return "비공개";
+    case "adults":
+      return "보호자만";
+    case "children-safe":
+      return "아이도 보기";
+    default:
+      return "전체 공개";
+  }
+}
+
 export function getContentRecordUpdatedLabel(updatedAt: string): string {
   const date = new Date(updatedAt);
 

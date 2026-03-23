@@ -28,13 +28,13 @@ type FamilyModuleShellProps = {
 function buildModeSummary(mode: FamilyModulePageMode, label: string, itemLabel: string): string {
   switch (mode) {
     case "list":
-      return `${label} lands on the collection route first so list, detail, new, and edit flows stay predictable.`;
+      return `${label}은 목록 경로를 기준으로 열리며, 목록·상세·작성·수정 흐름이 같은 구조로 이어집니다.`;
     case "detail":
-      return `The detail route is ready for the real ${itemLabel} view once module CRUD lands from the module thread.`;
+      return `${itemLabel} 상세 화면은 실제 CRUD 내용이 붙어도 같은 제품 셸 안에서 그대로 이어집니다.`;
     case "new":
-      return `The create route already exposes the final path and editor frame that module threads can replace with real actions.`;
+      return `작성 경로는 이미 최종 주소와 편집 프레임을 갖추고 있어서 실제 액션만 바로 연결하면 됩니다.`;
     case "edit":
-      return `The edit route keeps the same product shell as detail and create, so modules can plug in real forms without changing navigation.`;
+      return `수정 경로는 상세·작성과 같은 셸을 유지해서 폼만 바꿔도 네비게이션이 흔들리지 않습니다.`;
     default:
       return label;
   }
@@ -64,12 +64,12 @@ export function FamilyModuleShell({
   return (
     <div className="surface-stack">
       <HeroCard
-        eyebrow={`${spec.label} route`}
+        eyebrow={`${spec.label} 경로`}
         title={pageTitle}
         subtitle={buildModeSummary(mode, spec.label, spec.itemLabel)}
         meta={
           <>
-            <StatusPill tone={isEnabled ? "accent" : "warm"}>{isEnabled ? "live module" : "available next"}</StatusPill>
+            <StatusPill tone={isEnabled ? "accent" : "warm"}>{isEnabled ? "사용 중 모듈" : "다음 후보"}</StatusPill>
             <StatusPill>{workspaceView.family.slug}</StatusPill>
             <StatusPill tone="warm">{workspaceView.homePresetLabel}</StatusPill>
           </>
@@ -77,28 +77,28 @@ export function FamilyModuleShell({
         actions={
           <div className="inline-actions">
             <Link className="button button--secondary" href={moduleHref}>
-              List
+              목록
             </Link>
             <Link className="button button--secondary" href={newHref}>
-              New
+              작성
             </Link>
             <Link className="button button--ghost" href={buildFamilyHomeHref(workspaceView.family.slug)}>
-              Home
+              홈
             </Link>
           </div>
         }
       >
         <SurfaceCard
-          title="Route map"
-          description="These links stay stable while module threads replace the inside of each page with real CRUD."
+          title="경로 구성"
+          description="모듈 내부 구현이 바뀌어도 이 주소 구조는 그대로 유지됩니다."
           tone="accent"
         >
           <MetricList
             items={[
-              { label: "List", value: moduleHref },
-              { label: "Detail", value: detailHref },
-              { label: "New", value: newHref },
-              { label: "Edit", value: editHref },
+              { label: "목록", value: moduleHref },
+              { label: "상세", value: detailHref },
+              { label: "작성", value: newHref },
+              { label: "수정", value: editHref },
             ]}
           />
         </SurfaceCard>
@@ -106,91 +106,91 @@ export function FamilyModuleShell({
 
       {!isEnabled ? (
         <SurfaceCard
-          title="Module status"
-          description="This family currently keeps the module turned off, but the route stays live so product navigation does not break."
-          badge={<StatusPill tone="warm">off in builder</StatusPill>}
+          title="모듈 상태"
+          description="이 가족은 지금 이 모듈을 꺼둔 상태지만, 경로는 살아 있어서 테스트 링크는 유지됩니다."
+          badge={<StatusPill tone="warm">빌더에서 꺼짐</StatusPill>}
           tone="warm"
           footer={
             <div className="inline-actions">
               <Link className="button button--secondary" href={buildFamilyBuilderHref(workspaceView.family.slug)}>
-                Open builder
+                빌더 열기
               </Link>
               <Link className="button button--ghost" href={buildFamilyHomeHref(workspaceView.family.slug)}>
-                Back to home
+                홈으로
               </Link>
             </div>
           }
         >
           <p className="feature-copy">
-            Family app navigation still exposes the route so other threads can attach real CRUD without remapping paths later.
+            가족 앱 네비게이션은 경로를 계속 보여주므로, 나중에 실제 CRUD를 붙여도 링크를 다시 바꿀 필요가 없습니다.
           </p>
         </SurfaceCard>
       ) : null}
 
       <section className="surface-stack">
         <SectionHeader
-          kicker="Work surface"
-          title={`${spec.label} ${mode === "list" ? "module shell" : "page shell"}`}
+          kicker="작업 화면"
+          title={`${spec.label} ${mode === "list" ? "목록 화면" : "페이지 화면"}`}
           action={<StatusPill>{spec.itemLabel}</StatusPill>}
         />
 
         <div className="grid-two">
           <SurfaceCard
-            title="What lands here"
-            description="The route is already product-shaped, with links and slots that module-specific pages can replace incrementally."
+            title="이 화면에서 하는 일"
+            description="이 경로는 이미 제품 구조를 갖추고 있어서, 실제 모듈 페이지가 순차적으로 대체될 수 있습니다."
           >
             <ul className="stack-list">
               <li>{spec.summary}</li>
-              <li>Family slug and module path are already fixed for local tests.</li>
-              <li>Module teams can replace the cards below without changing the page contract.</li>
+              <li>가족 슬러그와 모듈 경로는 로컬 테스트 기준으로 이미 고정돼 있습니다.</li>
+              <li>아래 카드 영역만 바꿔도 페이지 계약은 그대로 유지됩니다.</li>
             </ul>
           </SurfaceCard>
 
           <SurfaceCard
-            title="Quick links"
-            description="Use these for smoke tests while CRUD is still arriving from module threads."
+            title="빠른 이동"
+            description="CRUD 연결 중에도 이 버튼으로 주요 경로를 바로 확인할 수 있습니다."
           >
             <div className="inline-actions">
               <Link className="button button--secondary" href={moduleHref}>
-                Open list
+                목록 열기
               </Link>
               <Link className="button button--secondary" href={detailHref}>
-                Open detail
+                상세 열기
               </Link>
               <Link className="button button--secondary" href={newHref}>
-                Open create
+                작성 열기
               </Link>
               <Link className="button button--secondary" href={editHref}>
-                Open edit
+                수정 열기
               </Link>
             </div>
           </SurfaceCard>
         </div>
 
         <SurfaceCard
-          title={mode === "list" ? "Collection surface" : mode === "detail" ? "Detail surface" : "Editor surface"}
+          title={mode === "list" ? "목록 화면" : mode === "detail" ? "상세 화면" : "편집 화면"}
           description={
             mode === "list"
-              ? "A stable collection page with example item routes and create entry points."
+              ? "예시 항목 경로와 작성 진입점을 함께 보여주는 기본 목록 화면입니다."
               : mode === "detail"
-                ? "A stable detail frame with metadata, route context, and edit links."
-                : "A stable editor frame with readonly sample fields and module-specific handoff space."
+                ? "메타 정보와 경로 맥락, 수정 링크를 함께 보여주는 기본 상세 화면입니다."
+                : "읽기 전용 샘플 필드와 모듈별 편집 연결 지점을 함께 둔 기본 편집 화면입니다."
           }
-          badge={<StatusPill tone="accent">{mode}</StatusPill>}
+          badge={<StatusPill tone="accent">{mode === "list" ? "목록" : mode === "detail" ? "상세" : mode === "new" ? "작성" : "수정"}</StatusPill>}
         >
           {mode === "list" ? (
             <div className="route-card-grid">
               <SurfaceCard
                 title={resolvedItemName}
-                description={`Example ${spec.itemLabel} route for local navigation checks.`}
+                description={`로컬 이동 테스트용 예시 ${spec.itemLabel} 경로입니다.`}
                 badge={<StatusPill>{spec.itemLabel}</StatusPill>}
                 footer={
                   <div className="inline-actions">
                     <Link className="button button--secondary button--small" href={detailHref}>
-                      Detail
+                      상세
                     </Link>
                     <Link className="button button--ghost button--small" href={editHref}>
-                      Edit
+                      수정
                     </Link>
                   </div>
                 }
@@ -200,16 +200,16 @@ export function FamilyModuleShell({
 
               <SurfaceCard
                 title={spec.createLabel}
-                description="The route is ready for module-specific forms."
-                badge={<StatusPill tone="warm">new</StatusPill>}
+                description="모듈 전용 작성 폼을 바로 붙일 수 있는 경로입니다."
+                badge={<StatusPill tone="warm">작성</StatusPill>}
                 footer={
                   <Link className="button button--secondary button--small" href={newHref}>
-                    Open create page
+                    작성 화면 열기
                   </Link>
                 }
               >
                 <p className="feature-copy">
-                  This page already lives at the final route, so create flows can attach without changing links.
+                  이 페이지는 이미 최종 경로에 있으므로, 작성 흐름만 연결하면 바로 쓸 수 있습니다.
                 </p>
               </SurfaceCard>
             </div>
@@ -217,54 +217,54 @@ export function FamilyModuleShell({
             <div className="route-detail-grid">
               <div className="surface-note">
                 <p>
-                  <strong>Item</strong>: {resolvedItemName}
+                  <strong>항목</strong>: {resolvedItemName}
                 </p>
                 <p>
-                  <strong>Route</strong>: {detailHref}
+                  <strong>경로</strong>: {detailHref}
                 </p>
                 <p>
-                  <strong>Family</strong>: {workspaceView.family.name}
+                  <strong>가족</strong>: {workspaceView.family.name}
                 </p>
               </div>
               <div className="surface-note">
                 <p>
-                  <strong>Next step</strong>: replace this card with the module-specific detail body.
+                  <strong>다음 단계</strong>: 이 카드를 실제 모듈 상세 본문으로 바꾸면 됩니다.
                 </p>
                 <p>
-                  <strong>Edit path</strong>: {editHref}
+                  <strong>수정 경로</strong>: {editHref}
                 </p>
                 <p>
-                  <strong>List path</strong>: {moduleHref}
+                  <strong>목록 경로</strong>: {moduleHref}
                 </p>
               </div>
             </div>
           ) : (
             <div className="form-stack">
               <label className="form-label">
-                Title
+                제목
                 <input
                   className="text-input"
                   defaultValue={
-                    mode === "edit" ? `${resolvedItemName} draft` : `${spec.label} draft title`
+                    mode === "edit" ? `${resolvedItemName} 초안` : `${spec.label} 초안 제목`
                   }
                   readOnly
                   type="text"
                 />
               </label>
               <label className="form-label">
-                Summary
+                요약
                 <textarea
                   className="text-input text-input--tall"
-                  defaultValue={`${spec.summary} This editor frame is ready for real module CRUD wiring.`}
+                  defaultValue={`${spec.summary} 이 편집 화면은 실제 모듈 CRUD 연결을 바로 받을 준비가 되어 있습니다.`}
                   readOnly
                 />
               </label>
               <div className="builder-save-row">
                 <Link className="button button--secondary" href={mode === "edit" ? detailHref : moduleHref}>
-                  {mode === "edit" ? "Back to detail" : "Back to list"}
+                  {mode === "edit" ? "상세로 돌아가기" : "목록으로 돌아가기"}
                 </Link>
                 <Link className="button button--ghost" href={mode === "edit" ? editHref : newHref}>
-                  Stay on this route
+                  이 경로 유지
                 </Link>
               </div>
             </div>

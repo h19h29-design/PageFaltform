@@ -10,6 +10,7 @@ export * from "./dashboard-feeds";
 export type FamilyRole = "owner" | "admin" | "member" | "guest" | "child";
 
 export type FamilyAccessMode = "password" | "code";
+export type FamilyVisibility = "public" | "private";
 
 export interface FamilyTheme {
   accentColor: string;
@@ -56,6 +57,7 @@ export interface FamilyTenantWorkspaceSettings {
   entryChecklist: FamilyJourneyStep[];
   theme: FamilyTheme;
   accessPolicy: FamilyAccessPolicy;
+  visibility: FamilyVisibility;
 }
 
 export interface FamilyTenantRecord
@@ -78,6 +80,7 @@ export interface FamilyPublicPreview {
   theme: FamilyTheme;
   accessLabel: string;
   accessHelperText: string;
+  visibility: FamilyVisibility;
 }
 
 export interface FamilyTenantContext {
@@ -154,6 +157,7 @@ const demoFamilies: FamilyTenantRecord[] = [
       helperText: "가족이 함께 쓰는 비밀번호를 입력하고 들어오세요.",
       secret: "yoon1234",
     },
+    visibility: "public",
   },
   {
     id: "family-park",
@@ -207,6 +211,7 @@ const demoFamilies: FamilyTenantRecord[] = [
       helperText: "초대받은 가족만 알고 있는 코드를 입력하세요.",
       secret: "springday",
     },
+    visibility: "public",
   },
 ];
 
@@ -226,6 +231,7 @@ function toPublicPreview(family: FamilyTenantRecord): FamilyPublicPreview {
     theme: { ...family.theme },
     accessLabel: family.accessPolicy.label,
     accessHelperText: family.accessPolicy.helperText,
+    visibility: family.visibility,
   };
 }
 

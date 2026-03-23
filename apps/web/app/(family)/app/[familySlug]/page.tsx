@@ -171,7 +171,7 @@ export default async function FamilyHomePage({ params }: FamilyHomePageProps) {
               title={section.title}
               description={section.description}
               eyebrow={section.kicker}
-              badge={<StatusPill>{section.cards.length}장</StatusPill>}
+              badge={<StatusPill>{section.cards.length}개</StatusPill>}
             >
               <div className="dashboard-section-grid">
                 {section.cards.map((card) => (

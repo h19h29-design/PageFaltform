@@ -15,6 +15,10 @@ import {
   type RuntimeFamilyRecord,
 } from "../../../../../src/lib/family-sites-store";
 import {
+  approveFamilyJoinRequest,
+  rejectFamilyJoinRequest,
+} from "../../../../../src/lib/family-join-requests";
+import {
   getActiveConsoleSession,
   isDatabaseSourceOfTruthEnabled,
   isDbAuthBaselineEnabled,
@@ -43,6 +47,12 @@ function parseThemePreset(formData: FormData) {
     familyThemePresetOptions.find((preset) => preset.key === selected)?.key ??
     familyThemePresetOptions[0]!.key
   );
+}
+
+function parseVisibility(formData: FormData) {
+  return String(formData.get("visibility") ?? "") === "private"
+    ? "private"
+    : "public";
 }
 
 async function mirrorFamilyWorkspaceToDatabase(input: {
@@ -113,6 +123,7 @@ export async function saveFamilyWorkspaceAction(formData: FormData) {
 
   const enabledModules = parseEnabledModules(formData);
   const themePreset = parseThemePreset(formData);
+  const visibility = parseVisibility(formData);
   const homePreset =
     String(formData.get("homePreset") ?? "") === "planner"
       ? "planner"
@@ -128,6 +139,7 @@ export async function saveFamilyWorkspaceAction(formData: FormData) {
     homePreset,
     entryPreset,
     themePreset,
+    visibility,
     updatedByUserId: consoleSession.userId,
   });
 
@@ -173,4 +185,52 @@ export async function resetFamilyWorkspaceAction(formData: FormData) {
   });
   revalidateFamilyPaths(familyAccess.family.slug);
   redirect(`/console/families/${familyAccess.family.slug}?state=reset`);
+}
+
+export async function approveFamilyJoinRequestAction(formData: FormData) {
+  const familySlug = String(formData.get("familySlug") ?? "").trim().toLowerCase();
+  const requestId = String(formData.get("requestId") ?? "").trim();
+  const consoleSession = await getActiveConsoleSession();
+
+  if (!consoleSession) {
+    redirect("/console/sign-in?error=session-required");
+  }
+
+  const familyAccess = await getConsoleFamilyBySlug(consoleSession, familySlug);
+
+  if (!familyAccess?.canManage) {
+    redirect("/console");
+  }
+
+  await approveFamilyJoinRequest({
+    requestId,
+    decidedByUserId: consoleSession.userId,
+  });
+
+  revalidateFamilyPaths(familySlug);
+  redirect(`/console/families/${familySlug}?state=request-approved`);
+}
+
+export async function rejectFamilyJoinRequestAction(formData: FormData) {
+  const familySlug = String(formData.get("familySlug") ?? "").trim().toLowerCase();
+  const requestId = String(formData.get("requestId") ?? "").trim();
+  const consoleSession = await getActiveConsoleSession();
+
+  if (!consoleSession) {
+    redirect("/console/sign-in?error=session-required");
+  }
+
+  const familyAccess = await getConsoleFamilyBySlug(consoleSession, familySlug);
+
+  if (!familyAccess?.canManage) {
+    redirect("/console");
+  }
+
+  await rejectFamilyJoinRequest({
+    requestId,
+    decidedByUserId: consoleSession.userId,
+  });
+
+  revalidateFamilyPaths(familySlug);
+  redirect(`/console/families/${familySlug}?state=request-rejected`);
 }

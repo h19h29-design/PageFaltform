@@ -9,7 +9,14 @@ import {
   type RuntimeFamilyGraphRecord as DatabaseFamilyGraphRecord,
   type RuntimeManagedFamilyRecord,
 } from "@ysplan/database";
-import { isConsoleManagerRole, type ConsoleManagerRole, type PlatformUserSession } from "@ysplan/auth";
+import {
+  canCreateFamilySites,
+  isConsoleManagerRole,
+  isPlatformMaster,
+  type ConsoleManagerRole,
+  type PlatformAccountRole,
+  type PlatformUserSession,
+} from "@ysplan/auth";
 import {
   normalizeModuleKeys,
   resolveFamilyWorkspace,
@@ -27,6 +34,7 @@ import {
   type FamilyPublicPreview,
   type FamilyTenantRecord,
   type FamilyTheme,
+  type FamilyVisibility,
 } from "@ysplan/tenant";
 
 type ConsoleFamilyRole = ConsoleManagerRole;
@@ -159,6 +167,7 @@ async function ensureFamilySiteStore(): Promise<void> {
 function sanitizeStoredCustomFamily(family: StoredCustomFamily): StoredCustomFamily {
   return {
     ...cloneFamilyTenantRecord(family),
+    visibility: family.visibility === "private" ? "private" : "public",
     ownerUserId: family.ownerUserId,
     createdAt: family.createdAt,
     updatedAt: family.updatedAt,
@@ -380,7 +389,7 @@ function createHighlights(input: {
     },
     {
       label: "홈 우선순위",
-      value: input.enabledModuleLabels.slice(0, 3).join(", ") || "Announcements",
+      value: input.enabledModuleLabels.slice(0, 3).join(", ") || "공지",
     },
     {
       label: "화면 성격",
@@ -504,6 +513,7 @@ function toRuntimeFamilyFromDatabase(
     entryChecklist: createEntryChecklist(accessMode),
     theme: toRuntimeTheme(family, demoFamily),
     accessPolicy: createAccessPolicy(accessMode, secretHint),
+    visibility: demoFamily?.visibility ?? "public",
     source: demoFamily ? "demo" : "custom",
     ...(family.createdByUserId ? { ownerUserId: family.createdByUserId } : {}),
     createdAt: family.createdAt,
@@ -551,9 +561,54 @@ export async function listRuntimeFamilies(): Promise<RuntimeFamilyRecord[]> {
   return [...baseFamilies, ...store.customFamilies.map(toRuntimeCustomFamily)];
 }
 
-export async function listPublicFamilyPreviews(): Promise<FamilyPublicPreview[]> {
+function canDiscoverFamily(
+  family: RuntimeFamilyRecord,
+  viewerSession?: PlatformUserSession | null,
+): boolean {
+  if (family.visibility !== "private") {
+    return true;
+  }
+
+  if (!viewerSession) {
+    return false;
+  }
+
+  if (isPlatformMaster(viewerSession)) {
+    return true;
+  }
+
+  if (family.ownerUserId && family.ownerUserId === viewerSession.userId) {
+    return true;
+  }
+
+  return viewerSession.memberships.some(
+    (membership) => membership.familySlug === family.slug,
+  );
+}
+
+export async function listPublicFamilyPreviews(
+  viewerSession?: PlatformUserSession | null,
+): Promise<FamilyPublicPreview[]> {
   const families = await listRuntimeFamilies();
-  return families.map(toFamilyPublicPreview);
+  return families
+    .filter((family) => canDiscoverFamily(family, viewerSession))
+    .map(toFamilyPublicPreview);
+}
+
+export async function countOwnedCustomFamilySites(userId: string): Promise<number> {
+  if (hasDatabaseSourceOfTruth()) {
+    const managedFamilies = await createAuthRuntimeService().listManagedFamiliesForUser(userId);
+    return managedFamilies.filter((record) => record.family.createdByUserId === userId).length;
+  }
+
+  const store = await readFamilySiteStore();
+  return store.customFamilies.filter((family) => family.ownerUserId === userId).length;
+}
+
+export function getCustomFamilyCreationLimit(
+  accountRole: PlatformAccountRole,
+): number {
+  return accountRole === "master" ? 99 : 5;
 }
 
 export async function resolveRuntimeFamilyFromSlug(familySlug: string): Promise<RuntimeFamilyRecord | null> {
@@ -566,6 +621,19 @@ export async function resolveRuntimeFamilyFromSlug(familySlug: string): Promise<
 
   const families = await listRuntimeFamilies();
   return families.find((family) => family.slug === normalizedSlug) ?? null;
+}
+
+export async function resolveDiscoverableRuntimeFamilyFromSlug(
+  familySlug: string,
+  viewerSession?: PlatformUserSession | null,
+): Promise<RuntimeFamilyRecord | null> {
+  const family = await resolveRuntimeFamilyFromSlug(familySlug);
+
+  if (!family) {
+    return null;
+  }
+
+  return canDiscoverFamily(family, viewerSession) ? family : null;
 }
 
 export async function resolveRuntimeFamilyFromDomain(domain: string): Promise<RuntimeFamilyRecord | null> {
@@ -634,7 +702,7 @@ export async function getConsoleFamilyBySlug(
 }
 
 export function canCreateCustomFamilies(session: PlatformUserSession): boolean {
-  return session.memberships.some((membership) => isConsoleManagerRole(membership.role));
+  return canCreateFamilySites(session) || session.memberships.some((membership) => isConsoleManagerRole(membership.role));
 }
 
 export async function getStoredWorkspaceDraft(
@@ -655,6 +723,7 @@ export async function saveRuntimeFamilyWorkspace(input: {
   homePreset: FamilyHomePreset;
   entryPreset: FamilyEntryPreset;
   themePreset: FamilyThemePresetKey;
+  visibility?: FamilyVisibility;
   updatedByUserId?: string | null;
 }): Promise<FamilyWorkspaceDraft> {
   const draft = resolveFamilyWorkspace({
@@ -685,6 +754,15 @@ export async function saveRuntimeFamilyWorkspace(input: {
   }
 
   const store = await readFamilySiteStore();
+
+  if (input.family.source === "custom") {
+    const customFamily = store.customFamilies.find((family) => family.slug === input.family.slug);
+
+    if (customFamily && input.visibility) {
+      customFamily.visibility = input.visibility;
+      customFamily.updatedAt = draft.updatedAt;
+    }
+  }
 
   store.workspaceDrafts[input.family.slug] = createStoredWorkspaceDraftEntry(draft, "builder-save");
   await writeFamilySiteStore(store);
@@ -727,6 +805,7 @@ export async function resetRuntimeFamilyWorkspace(
 
 export async function createCustomFamilySite(input: {
   ownerUserId: string;
+  creatorPlatformRole: PlatformAccountRole;
   name: string;
   slug: string;
   tagline: string;
@@ -736,6 +815,7 @@ export async function createCustomFamilySite(input: {
   memberCount: number;
   accessMode: FamilyAccessMode;
   accessSecret: string;
+  visibility: FamilyVisibility;
   timezone: string;
   themePreset: FamilyThemePresetKey;
   enabledModules: string[];
@@ -756,6 +836,14 @@ export async function createCustomFamilySite(input: {
 
   if (duplicatedFamily) {
     throw new Error("이미 사용 중인 가족 홈 주소입니다.");
+  }
+
+  if (!hasDatabaseSourceOfTruth() && input.creatorPlatformRole !== "master") {
+    const ownedFamilyCount = await countOwnedCustomFamilySites(input.ownerUserId);
+
+    if (ownedFamilyCount >= getCustomFamilyCreationLimit(input.creatorPlatformRole)) {
+      throw new Error("정회원은 가족홈을 최대 5개까지 만들 수 있습니다.");
+    }
   }
 
   const now = new Date().toISOString();
@@ -806,6 +894,7 @@ export async function createCustomFamilySite(input: {
     entryChecklist: createEntryChecklist(input.accessMode),
     theme: getFamilyThemePresetTheme(input.themePreset),
     accessPolicy: createAccessPolicy(input.accessMode, accessSecret),
+    visibility: input.visibility,
     ownerUserId: input.ownerUserId,
     createdAt: now,
     updatedAt: now,

@@ -5,7 +5,7 @@ import { PageShell, SurfaceCard } from "@ysplan/ui";
 export default function NotFound() {
   return (
     <PageShell
-      eyebrow="Not Found"
+      eyebrow="찾을 수 없음"
       title="찾으시는 가족 공간이 없어요"
       subtitle="주소가 바뀌었거나 아직 준비되지 않은 가족 공간일 수 있어요."
     >

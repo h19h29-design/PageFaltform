@@ -126,6 +126,7 @@ export async function createFamilySiteAction(formData: FormData) {
   try {
     const family = await createCustomFamilySite({
       ownerUserId: consoleSession.userId,
+      creatorPlatformRole: consoleSession.platformRole,
       name: String(formData.get("name") ?? ""),
       slug: String(formData.get("slug") ?? ""),
       tagline: String(formData.get("tagline") ?? ""),
@@ -138,6 +139,10 @@ export async function createFamilySiteAction(formData: FormData) {
           ? "code"
           : "password",
       accessSecret: String(formData.get("accessSecret") ?? ""),
+      visibility:
+        String(formData.get("visibility") ?? "") === "private"
+          ? "private"
+          : "public",
       timezone: String(formData.get("timezone") ?? "Asia/Seoul"),
       themePreset,
       enabledModules,

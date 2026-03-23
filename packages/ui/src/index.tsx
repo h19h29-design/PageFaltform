@@ -1,5 +1,7 @@
 import type { PropsWithChildren, ReactNode } from "react";
 
+import { ExplanationToggle } from "./explanation-toggle";
+
 function joinClassNames(...classNames: Array<string | false | null | undefined>): string {
   return classNames.filter(Boolean).join(" ");
 }
@@ -20,7 +22,10 @@ export function PageShell(props: {
             <h1 className="page-title">{props.title}</h1>
             {props.subtitle ? <p className="page-subtitle">{props.subtitle}</p> : null}
           </div>
-          {props.actions ? <div className="page-actions">{props.actions}</div> : null}
+          <div className="page-actions">
+            <ExplanationToggle />
+            {props.actions}
+          </div>
         </div>
       </header>
       <div className="page-shell__content">{props.children}</div>

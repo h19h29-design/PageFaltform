@@ -7,7 +7,6 @@ import {
   canAccessConsole,
   hashPassword,
   verifyPasswordHash,
-  type PlatformMembership,
 } from "@ysplan/auth";
 import {
   bootstrapAuthDataBaseline,
@@ -18,12 +17,13 @@ import {
   PLATFORM_USER_COOKIE,
   serializePlatformUserSession,
 } from "../lib/session-cookies";
+import { createFamilyJoinRequest } from "../lib/family-join-requests";
 import {
   createLocalPlatformSession,
   createLocalPlatformUserRecord,
   findLocalPlatformUserByEmail,
 } from "../lib/local-platform-auth";
-import { resolveRuntimeFamilyFromSlug } from "../lib/family-sites-store";
+import { resolveDiscoverableRuntimeFamilyFromSlug } from "../lib/family-sites-store";
 
 function isDatabaseSourceOfTruthEnabled(): boolean {
   return Boolean(process.env.DATABASE_URL);
@@ -110,22 +110,16 @@ export async function submitLocalSignUpAction(formData: FormData) {
     redirect("/sign-up?error=weak-password");
   }
 
-  let memberships: PlatformMembership[] = [];
+  let selectedFamilyName: string | null = null;
 
   if (selectedFamilySlug) {
-    const family = await resolveRuntimeFamilyFromSlug(selectedFamilySlug);
+    const family = await resolveDiscoverableRuntimeFamilyFromSlug(selectedFamilySlug);
 
     if (!family) {
       redirect("/sign-up?error=invalid-family");
     }
 
-    memberships = [
-      {
-        familySlug: family.slug,
-        familyName: family.name,
-        role: "member",
-      },
-    ];
+    selectedFamilyName = family.name;
   }
 
   if (!isDatabaseSourceOfTruthEnabled()) {
@@ -134,12 +128,23 @@ export async function submitLocalSignUpAction(formData: FormData) {
         displayName,
         email,
         passwordHash: hashPassword(password),
-        memberships,
       });
+
+      if (selectedFamilySlug && selectedFamilyName) {
+        await createFamilyJoinRequest({
+          familySlug: selectedFamilySlug,
+          familyName: selectedFamilyName,
+          requesterUserId: user.id,
+          requesterDisplayName: user.displayName,
+          requesterEmail: user.email,
+          requesterPlatformRole: user.platformRole,
+        });
+      }
+
       const session = createLocalPlatformSession(user);
 
       await writePlatformSessionCookie(session);
-      redirect(selectedFamilySlug ? `/f/${selectedFamilySlug}?step=access` : "/");
+      redirect(selectedFamilySlug ? `/f/${selectedFamilySlug}?state=requested` : "/");
     } catch (error) {
       if (error instanceof Error && error.message === "email-already-in-use") {
         redirect("/sign-up?error=email-already-in-use");

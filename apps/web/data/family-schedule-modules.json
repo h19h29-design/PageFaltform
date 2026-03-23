@@ -55,14 +55,14 @@
       "todo": [
         {
           "id": "fae1dbcd-58f2-4f4e-a089-7e06a3423fa1",
-          "slug": "wave-03-todo-1774059683",
+          "slug": "school-bag-final-check",
           "audience": "family-shared",
           "visibilityScope": "all",
-          "title": "Wave 03 todo updated",
+          "title": "등교 가방 최종 확인",
           "dueAt": "2026-03-21T13:00:00.000Z",
           "completed": true,
           "blocksFamilyFlow": true,
-          "assigneeLabel": "Local Tester"
+          "assigneeLabel": "엄마"
         },
         {
           "id": "grocery-restock",
@@ -121,15 +121,15 @@
       "schoolTimetable": [
         {
           "id": "52adcd72-ae9f-4084-b0e7-297bf786c224",
-          "slug": "wave-03-school-1774059701",
+          "slug": "minseo-after-school-english",
           "audience": "family-shared",
           "visibilityScope": "all",
-          "studentLabel": "Minseo",
-          "title": "After-school English",
+          "studentLabel": "민서",
+          "title": "방과 후 영어 보충",
           "startsAt": "2026-03-22T06:00:00.000Z",
           "affectsFamilyFlow": true,
           "endsAt": "2026-03-22T08:00:00.000Z",
-          "preparationNote": "Bring workbook"
+          "preparationNote": "워크북, 단어장"
         },
         {
           "id": "minseo-school-route",

@@ -4,97 +4,103 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import {
+  canAccessConsole,
   createFamilyAccessSession,
+  getMembershipForFamily,
   toFamilyViewerRole,
-  verifySharedSecret,
-  verifySharedSecretHash,
 } from "@ysplan/auth";
-import { createAuthRuntimeService } from "@ysplan/database";
 
-import { FAMILY_ACCESS_COOKIE, serializeFamilyAccessSession } from "../../../../src/lib/session-cookies";
-import { resolveRuntimeFamilyFromSlug } from "../../../../src/lib/family-sites-store";
+import { createFamilyJoinRequest } from "../../../../src/lib/family-join-requests";
 import {
-  getActivePlatformMembershipForFamily,
+  resolveDiscoverableRuntimeFamilyFromSlug,
+  resolveRuntimeFamilyFromSlug,
+} from "../../../../src/lib/family-sites-store";
+import {
   getActivePlatformUserSession,
-  isDatabaseSourceOfTruthEnabled,
 } from "../../../../src/lib/server-sessions";
+import {
+  FAMILY_ACCESS_COOKIE,
+  serializeFamilyAccessSession,
+} from "../../../../src/lib/session-cookies";
 
-export async function submitFamilyAccessAction(formData: FormData) {
+export async function submitFamilyJoinRequestAction(formData: FormData) {
   const familySlug = String(formData.get("familySlug") ?? "").trim().toLowerCase();
-  const secret = String(formData.get("secret") ?? "");
+  const nextSignInPath = `/sign-in?next=${encodeURIComponent(`/f/${familySlug}`)}`;
+  const platformSession = await getActivePlatformUserSession();
 
-  if (isDatabaseSourceOfTruthEnabled()) {
-    const runtimeService = createAuthRuntimeService();
-    const family = await runtimeService.findFamilyBySlug(familySlug);
+  if (!platformSession) {
+    redirect(nextSignInPath);
+  }
 
-    if (!family?.accessPolicy?.sharedSecretHash) {
-      redirect(`/f/${familySlug}?step=access&error=family-not-found`);
-    }
+  const family = await resolveDiscoverableRuntimeFamilyFromSlug(
+    familySlug,
+    platformSession,
+  );
 
-    if (
-      !verifySharedSecretHash({
-        familySlug,
-        providedSecret: secret,
-        sharedSecretHash: family.accessPolicy.sharedSecretHash,
-      })
-    ) {
-      redirect(`/f/${familySlug}?step=access&error=invalid-secret`);
-    }
+  if (!family) {
+    redirect("/?error=invalid-family");
+  }
 
-    const platformSession = await getActivePlatformUserSession();
-    const membership = await getActivePlatformMembershipForFamily(familySlug);
-    const session = await runtimeService.createFamilyAccessSessionForFamily({
-      familySlug,
-      userId: platformSession?.userId ?? null,
-      viewerRole: membership ? toFamilyViewerRole(membership.role) : "guest",
-    });
-    const cookieStore = await cookies();
+  const existingMembership = getMembershipForFamily(platformSession, family.slug);
 
-    cookieStore.set(FAMILY_ACCESS_COOKIE, serializeFamilyAccessSession(session), {
-      httpOnly: true,
-      sameSite: "lax",
-      path: "/",
-      expires: new Date(session.expiresAt),
-    });
+  if (existingMembership) {
+    redirect(`/f/${family.slug}?state=already-member`);
+  }
 
-    redirect(`/app/${familySlug}`);
+  await createFamilyJoinRequest({
+    familySlug: family.slug,
+    familyName: family.name,
+    requesterUserId: platformSession.userId,
+    requesterDisplayName: platformSession.displayName,
+    requesterEmail: platformSession.email,
+    requesterPlatformRole: platformSession.platformRole,
+  });
+
+  redirect(`/f/${family.slug}?state=requested`);
+}
+
+export async function submitApprovedFamilyEntryAction(formData: FormData) {
+  const familySlug = String(formData.get("familySlug") ?? "").trim().toLowerCase();
+  const platformSession = await getActivePlatformUserSession();
+
+  if (!platformSession) {
+    redirect(`/sign-in?next=${encodeURIComponent(`/f/${familySlug}`)}`);
   }
 
   const family = await resolveRuntimeFamilyFromSlug(familySlug);
 
   if (!family) {
-    redirect(`/f/${familySlug}?step=access&error=family-not-found`);
+    redirect(`/f/${familySlug}?error=family-not-found`);
   }
 
-  if (
-    !verifySharedSecret({
-      expectedSecret: family.accessPolicy.secret,
-      providedSecret: secret,
-    })
-  ) {
-    redirect(`/f/${familySlug}?step=access&error=invalid-secret`);
+  const membership = getMembershipForFamily(platformSession, family.slug);
+  const hasConsoleBypass =
+    canAccessConsole(platformSession, family.slug) ||
+    family.ownerUserId === platformSession.userId;
+
+  if (family.visibility === "private" && !membership && !hasConsoleBypass) {
+    redirect("/?error=private-family");
   }
 
-  const platformSession = await getActivePlatformUserSession();
-  const membership = await getActivePlatformMembershipForFamily(familySlug);
-  const now = new Date();
+  if (!membership && !hasConsoleBypass) {
+    redirect(`/f/${family.slug}?error=approval-required`);
+  }
+
   const session = createFamilyAccessSession({
     familySlug: family.slug,
     tenantId: family.id,
-    viewerRole: membership ? toFamilyViewerRole(membership.role) : "guest",
-    userId: platformSession?.userId ?? null,
-    now,
+    viewerRole: membership ? toFamilyViewerRole(membership.role) : "member",
+    userId: platformSession.userId,
+    now: new Date(),
   });
-  const expiresAt = new Date(session.expiresAt);
-
   const cookieStore = await cookies();
 
   cookieStore.set(FAMILY_ACCESS_COOKIE, serializeFamilyAccessSession(session), {
     httpOnly: true,
     sameSite: "lax",
     path: "/",
-    expires: expiresAt,
+    expires: new Date(session.expiresAt),
   });
 
-  redirect(`/app/${familySlug}`);
+  redirect(`/app/${family.slug}`);
 }

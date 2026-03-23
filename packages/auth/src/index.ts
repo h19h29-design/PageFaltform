@@ -7,6 +7,7 @@ export type { FamilyRole } from "@ysplan/tenant";
 export type AuthFlowId = "family-access" | "console-sign-in";
 export type FamilyViewerRole = Extract<FamilyRole, "guest" | "member" | "child">;
 export type ConsoleManagerRole = Extract<FamilyRole, "owner" | "admin">;
+export type PlatformAccountRole = "master" | "full-member" | "associate-member";
 
 export interface FamilyAccessSession {
   kind: "family-access";
@@ -31,6 +32,7 @@ export interface PlatformUserSession {
   userId: string;
   displayName: string;
   email: string;
+  platformRole: PlatformAccountRole;
   memberships: PlatformMembership[];
   sessionToken?: string;
   source?: "demo" | "database";
@@ -104,6 +106,7 @@ interface DemoPlatformUser {
   displayName: string;
   email: string;
   password: string;
+  platformRole: PlatformAccountRole;
   memberships: PlatformMembership[];
 }
 
@@ -279,6 +282,7 @@ const demoPlatformUsers: DemoPlatformUser[] = [
     displayName: "윤 운영자",
     email: "owner@yoon.local",
     password: "demo-owner",
+    platformRole: "master",
     memberships: [
       {
         familySlug: "yoon",
@@ -292,6 +296,7 @@ const demoPlatformUsers: DemoPlatformUser[] = [
     displayName: "박 관리자",
     email: "admin@park.local",
     password: "demo-admin",
+    platformRole: "full-member",
     memberships: [
       {
         familySlug: "park",
@@ -305,6 +310,7 @@ const demoPlatformUsers: DemoPlatformUser[] = [
     displayName: "윤 가족 구성원",
     email: "member@yoon.local",
     password: "demo-member",
+    platformRole: "associate-member",
     memberships: [
       {
         familySlug: "yoon",
@@ -410,6 +416,29 @@ export function getConsoleManagerMemberships(
   return session.memberships.filter((membership) => isConsoleManagerRole(membership.role));
 }
 
+export function isPlatformMaster(
+  value: PlatformUserSession | PlatformAccountRole,
+): boolean {
+  return typeof value === "string"
+    ? value === "master"
+    : value.platformRole === "master";
+}
+
+export function canCreateFamilySites(session: PlatformUserSession): boolean {
+  return session.platformRole === "master" || session.platformRole === "full-member";
+}
+
+export function getPlatformAccountRoleLabel(role: PlatformAccountRole): string {
+  switch (role) {
+    case "master":
+      return "마스터";
+    case "full-member":
+      return "정회원";
+    default:
+      return "준회원";
+  }
+}
+
 export function createFamilyAccessSession(input: {
   familySlug: string;
   tenantId: string;
@@ -443,6 +472,7 @@ export function createPlatformUserSession(input: {
   userId: string;
   displayName: string;
   email: string;
+  platformRole?: PlatformAccountRole;
   memberships: PlatformMembership[];
   sessionToken?: string;
   source?: "demo" | "database";
@@ -460,6 +490,7 @@ export function createPlatformUserSession(input: {
     userId: input.userId,
     displayName: input.displayName,
     email: normalizeEmail(input.email),
+    platformRole: input.platformRole ?? "associate-member",
     memberships: input.memberships,
     ...(input.sessionToken ? { sessionToken: input.sessionToken } : {}),
     ...(input.source ? { source: input.source } : {}),
@@ -526,6 +557,7 @@ export function verifyConsoleCredentials(input: {
       userId: user.id,
       displayName: user.displayName,
       email: user.email,
+      platformRole: user.platformRole,
       memberships: user.memberships,
       source: "demo",
       ...(input.now ? { now: input.now } : {}),
@@ -558,10 +590,14 @@ export function requireFamilyRole(
 }
 
 export function canAccessConsole(session: PlatformUserSession, familySlug?: string): boolean {
+  if (session.platformRole === "master") {
+    return true;
+  }
+
   const consoleMemberships = getConsoleManagerMemberships(session);
 
   if (!familySlug) {
-    return consoleMemberships.length > 0;
+    return canCreateFamilySites(session) || consoleMemberships.length > 0;
   }
 
   return consoleMemberships.some((membership) => membership.familySlug === familySlug);
@@ -572,15 +608,28 @@ export function listDemoConsoleUsers(): Array<{
   email: string;
   password: string;
   displayName: string;
+  platformRole: PlatformAccountRole;
   memberships: PlatformMembership[];
 }> {
   return demoPlatformUsers
-    .filter((user) => user.memberships.some((membership) => isConsoleManagerRole(membership.role)))
+    .filter((user) =>
+      canAccessConsole(
+        createPlatformUserSession({
+          userId: user.id,
+          displayName: user.displayName,
+          email: user.email,
+          platformRole: user.platformRole,
+          memberships: user.memberships,
+          source: "demo",
+        }),
+      ),
+    )
     .map((user) => ({
       id: user.id,
       email: user.email,
       password: user.password,
       displayName: user.displayName,
+      platformRole: user.platformRole,
       memberships: user.memberships,
     }));
 }

@@ -15,7 +15,9 @@ import { getContentCrudMessage } from "src/lib/content-modules";
 import {
   getAnnouncementRecord,
   getAnnouncementSeverityLabel,
+  getContentAudienceLabel,
   getContentRecordUpdatedLabel,
+  getContentVisibilityLabel,
 } from "src/lib/content-store";
 import { requireFamilyAppAccess } from "src/lib/family-app-context";
 
@@ -71,7 +73,7 @@ export default async function AnnouncementDetailPage(props: AnnouncementDetailPa
       {message ? <ContentMessageCard title="저장 완료" tone="accent">{message}</ContentMessageCard> : null}
 
       <HeroCard
-        eyebrow="Announcement detail"
+        eyebrow="공지 상세"
         title={record.title}
         subtitle={record.excerpt}
         meta={
@@ -81,7 +83,7 @@ export default async function AnnouncementDetailPage(props: AnnouncementDetailPa
             </StatusPill>
             {record.pinned ? <StatusPill tone="warm">상단 고정</StatusPill> : null}
             {record.requiresReadAck ? <StatusPill>읽음 확인</StatusPill> : null}
-            <StatusPill>{record.visibilityScope}</StatusPill>
+            <StatusPill>{getContentVisibilityLabel(record.visibilityScope)}</StatusPill>
           </>
         }
       >
@@ -90,7 +92,7 @@ export default async function AnnouncementDetailPage(props: AnnouncementDetailPa
             items={[
               { label: "최근 수정", value: getContentRecordUpdatedLabel(record.updatedAt) },
               { label: "읽음 확인", value: `${record.readAckConfirmed ?? 0}/${record.readAckTarget ?? 0}` },
-              { label: "대상", value: record.audience },
+              { label: "대상", value: getContentAudienceLabel(record.audience) },
               { label: "슬러그", value: record.slug },
             ]}
           />
@@ -105,8 +107,8 @@ export default async function AnnouncementDetailPage(props: AnnouncementDetailPa
         <SurfaceCard title="노출 설정" description="홈과 목록에서 쓰이는 메타 정보">
           <ul className="stack-list">
             <li>심각도: {getAnnouncementSeverityLabel(record.severity)}</li>
-            <li>노출 범위: {record.visibilityScope}</li>
-            <li>대상: {record.audience}</li>
+            <li>노출 범위: {getContentVisibilityLabel(record.visibilityScope)}</li>
+            <li>대상: {getContentAudienceLabel(record.audience)}</li>
             <li>노출 시작: {record.displayStartsAt ?? "-"}</li>
             <li>노출 종료: {record.displayEndsAt ?? "-"}</li>
           </ul>
