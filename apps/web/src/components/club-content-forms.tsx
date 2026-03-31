@@ -63,7 +63,7 @@ export function ClubAnnouncementFormFields(props: { initial?: Partial<ClubAnnoun
             className="text-input"
             defaultValue={toTextValue(initial.slug)}
             name="slug"
-            placeholder="제목을 바탕으로 자동 생성"
+            placeholder="비워 두면 제목 기준으로 만듭니다"
             type="text"
           />
         </label>
@@ -99,7 +99,7 @@ export function ClubAnnouncementFormFields(props: { initial?: Partial<ClubAnnoun
         </label>
         <label className="content-checkbox">
           <input defaultChecked={toCheckedValue(initial.featured)} name="featured" type="checkbox" />
-          <span>대표 표시</span>
+          <span>홈에 노출</span>
         </label>
       </div>
 
@@ -142,7 +142,7 @@ export function ClubEventFormFields(props: { initial?: Partial<ClubEventRecordIn
             className="text-input"
             defaultValue={toTextValue(initial.slug)}
             name="slug"
-            placeholder="제목을 바탕으로 자동 생성"
+            placeholder="비워 두면 제목 기준으로 만듭니다"
             type="text"
           />
         </label>
@@ -201,7 +201,7 @@ export function ClubEventFormFields(props: { initial?: Partial<ClubEventRecordIn
         </label>
         <label className="content-checkbox">
           <input defaultChecked={toCheckedValue(initial.featured)} name="featured" type="checkbox" />
-          <span>대표 표시</span>
+          <span>홈에 노출</span>
         </label>
       </div>
 
@@ -234,7 +234,7 @@ export function ClubGalleryFormFields(props: { initial?: Partial<ClubGalleryReco
             className="text-input"
             defaultValue={toTextValue(initial.slug)}
             name="slug"
-            placeholder="제목을 바탕으로 자동 생성"
+            placeholder="비워 두면 제목 기준으로 만듭니다"
             type="text"
           />
         </label>
@@ -277,7 +277,7 @@ export function ClubGalleryFormFields(props: { initial?: Partial<ClubGalleryReco
         </label>
         <label className="content-checkbox">
           <input defaultChecked={toCheckedValue(initial.featured)} name="featured" type="checkbox" />
-          <span>대표 표시</span>
+          <span>홈에 노출</span>
         </label>
       </div>
 

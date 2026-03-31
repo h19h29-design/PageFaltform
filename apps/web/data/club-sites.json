@@ -2,23 +2,24 @@
   "version": 1,
   "metadata": {
     "backend": "file",
-    "lastWriteAt": "2026-03-31T09:31:40.727Z"
+    "lastWriteAt": "2026-03-31T21:30:00.000Z"
   },
   "customClubs": [
     {
       "id": "club-bpage-run",
       "slug": "bpage-running-crew",
-      "name": "B-page ?? ??",
-      "tagline": "?? ?? ??? ?? ??? ??? ?? ?? ??",
-      "description": "?? ??? ??? ?? ? ???? ??? writable overlay? ??? ?????.",
-      "sportLabel": "??",
-      "category": "??",
-      "location": "?? ??",
-      "currentFocus": "4? 10km ?? ???",
-      "nextEventLabel": "??? 20:00 ??? 5km",
+      "name": "B-page 러닝 크루",
+      "tagline": "주간 러닝 일정과 활동 기록을 가볍게 이어 보는 모임",
+      "description": "초보부터 기록 갱신을 노리는 멤버까지 함께 달리는 러닝 크루입니다. 공지, 일정, 활동 사진, 주간 챌린지 흐름을 한 보드에서 관리합니다.",
+      "sportLabel": "러닝",
+      "category": "러닝",
+      "location": "서울 사의",
+      "currentFocus": "4월 10km 완주 챌린지",
+      "nextEventLabel": "목요일 20:00 사의천 러닝 5km",
       "visibility": "public",
       "joinPolicy": "approval-required",
       "themePreset": "ocean-depths",
+      "ownerUserId": "demo-club-owner-running",
       "ownerName": "민호 캡틴",
       "ownerEmail": "captain-running@b-page.local",
       "enabledModules": [
@@ -29,7 +30,7 @@
       ],
       "sampleModules": [
         "공지",
-        "이벤트",
+        "일정",
         "갤러리",
         "FAQ"
       ],
@@ -37,34 +38,34 @@
         {
           "key": "announcement",
           "title": "이번 주 공지",
-          "description": "집결 장소, 우천 시 대체 동선, 준비물을 공지합니다.",
+          "description": "집결 장소, 우천 시 대체 동선, 준비물을 먼저 확인합니다.",
           "audience": "public"
         },
         {
           "key": "event",
           "title": "다음 러닝 일정",
-          "description": "이번 주 러닝 스케줄과 페이스 그룹 안내를 보여줍니다.",
+          "description": "이번 주 러닝 루트와 페이스 그룹 안내를 보여줍니다.",
           "audience": "public"
         },
         {
           "key": "leaderboard",
-          "title": "월간 챌린지",
-          "description": "활동 기록을 올린 멤버 순위를 멤버 전용으로 노출합니다.",
+          "title": "주간 챌린지",
+          "description": "활동 기록과 상위 멤버 순위를 멤버 전용으로 보여줍니다.",
           "audience": "member"
         }
       ],
       "highlights": [
         {
           "label": "운영 초점",
-          "value": "4? 10km ?? ???"
+          "value": "4월 10km 완주 챌린지"
         },
         {
           "label": "다음 일정",
-          "value": "??? 20:00 ??? 5km"
+          "value": "목요일 20:00 사의천 러닝 5km"
         },
         {
           "label": "가입 방식",
-          "value": "로그인 후 승인"
+          "value": "로그인 후 신청"
         }
       ],
       "members": [
@@ -77,14 +78,14 @@
         },
         {
           "userId": "local-user-0ee8a983-b9aa-48ef-a9db-b44495dfd56d",
-          "displayName": "?????",
+          "displayName": "클럽플로우",
           "email": "club-flow-1774947598266@example.com",
           "role": "member",
           "joinedAt": "2026-03-31T08:59:58.290Z"
         },
         {
           "userId": "local-user-0bbbed40-0fe5-4f2b-96fa-048df74c573b",
-          "displayName": "????",
+          "displayName": "클럽멤버",
           "email": "club-member-check@example.com",
           "role": "member",
           "joinedAt": "2026-03-31T09:00:18.940Z"
@@ -92,25 +93,24 @@
       ],
       "source": "demo",
       "createdAt": "2026-03-01T09:00:00.000Z",
-      "updatedAt": "2026-03-31T09:00:18.940Z",
-      "ownerUserId": "demo-club-owner-running"
+      "updatedAt": "2026-03-31T09:00:18.940Z"
     },
     {
       "id": "club-a7d01905-9558-45e7-a87c-8e499a822fe5",
       "slug": "hahahah",
-      "name": "한강 새벽 러닝",
-      "tagline": "러닝",
-      "description": "좋앙",
+      "name": "한강 저녁 러닝",
+      "tagline": "가볍게 모여 달리고 기록을 남기는 테스트용 클럽",
+      "description": "관리자 생성과 가입 승인 흐름을 점검하기 위해 만든 테스트 클럽입니다. 공지, 일정, 갤러리 흐름을 모두 실험할 수 있습니다.",
       "sportLabel": "러닝",
       "category": "러닝",
       "location": "서울",
-      "currentFocus": "5키로ㅓ 달리기",
-      "nextEventLabel": "꾸준히 달리기",
+      "currentFocus": "5km 함께 달리기",
+      "nextEventLabel": "가볍게 한 바퀴 돌기",
       "visibility": "public",
       "joinPolicy": "approval-required",
       "themePreset": "golden-hour",
       "ownerUserId": "user-1",
-      "ownerName": "윤 운영자",
+      "ownerName": "운영자",
       "ownerEmail": "owner@yoon.local",
       "enabledModules": [
         "announcements",
@@ -121,7 +121,7 @@
       ],
       "sampleModules": [
         "공지",
-        "이벤트",
+        "일정",
         "갤러리",
         "리더보드",
         "자료실"
@@ -130,7 +130,7 @@
         {
           "key": "announcement",
           "title": "운영 공지",
-          "description": "모임 공지와 준비 사항을 먼저 보여 줍니다.",
+          "description": "모임 공지와 준비 사항을 가장 먼저 보여줍니다.",
           "audience": "public"
         },
         {
@@ -142,33 +142,34 @@
         {
           "key": "member",
           "title": "멤버 전용 보드",
-          "description": "승인된 멤버만 보는 기록과 운영 메모를 담습니다.",
+          "description": "승인된 멤버만 보는 기록과 운영 메모 공간입니다.",
           "audience": "member"
         }
       ],
       "highlights": [
         {
           "label": "운영 초점",
-          "value": "5키로ㅓ 달리기"
+          "value": "5km 함께 달리기"
         },
         {
           "label": "다음 일정",
-          "value": "꾸준히 달리기"
+          "value": "가볍게 한 바퀴 돌기"
         },
         {
           "label": "가입 방식",
-          "value": "로그인 후 승인"
+          "value": "로그인 후 신청"
         }
       ],
       "members": [
         {
           "userId": "user-1",
-          "displayName": "윤 운영자",
+          "displayName": "운영자",
           "email": "owner@yoon.local",
           "role": "owner",
           "joinedAt": "2026-03-31T09:31:40.726Z"
         }
       ],
+      "source": "custom",
       "createdAt": "2026-03-31T09:31:40.726Z",
       "updatedAt": "2026-03-31T09:31:40.726Z"
     }

@@ -14,11 +14,11 @@ import {
   updateClubEventRecord,
   updateClubGalleryRecord,
   type ClubAnnouncementRecordInput,
+  type ClubContentModuleKey,
   type ClubEventRecordInput,
   type ClubGalleryRecordInput,
-  type ClubContentModuleKey,
 } from "../lib/club-content-store";
-import { requireClubAppAccess } from "../lib/club-app-access";
+import { requireClubManageAccess } from "../lib/club-app-access";
 
 function isRedirectError(error: unknown): error is { digest: string } {
   if (!error || typeof error !== "object") {
@@ -30,7 +30,9 @@ function isRedirectError(error: unknown): error is { digest: string } {
 }
 
 function encodeError(error: unknown): string {
-  return encodeURIComponent(error instanceof Error ? error.message : "예기치 못한 오류가 발생했습니다.");
+  return encodeURIComponent(
+    error instanceof Error ? error.message : "예상하지 못한 오류가 발생했습니다.",
+  );
 }
 
 function parseClubSlug(formData: FormData): string {
@@ -84,7 +86,7 @@ function parseIso(formData: FormData, fieldName: string, fieldLabel: string): st
   const raw = String(formData.get(fieldName) ?? "").trim();
 
   if (!raw) {
-    throw new Error(`${fieldLabel}을(를) 입력해 주세요.`);
+    throw new Error(`${fieldLabel}을 입력해 주세요.`);
   }
 
   const date = new Date(raw);
@@ -130,7 +132,11 @@ function buildClubModuleEditHref(
   return `${buildClubModuleDetailHref(clubSlug, moduleKey, slug)}/edit`;
 }
 
-function revalidateClubContentPaths(clubSlug: string, moduleKey: ClubContentModuleKey, slug?: string) {
+function revalidateClubContentPaths(
+  clubSlug: string,
+  moduleKey: ClubContentModuleKey,
+  slug?: string,
+) {
   const base = `/clubs/${clubSlug}`;
 
   revalidatePath(base);
@@ -146,7 +152,7 @@ function revalidateClubContentPaths(clubSlug: string, moduleKey: ClubContentModu
 }
 
 async function requireClubContentMutationAccess(clubSlug: string) {
-  await requireClubAppAccess(clubSlug);
+  await requireClubManageAccess(clubSlug);
 }
 
 function parseAnnouncementInput(formData: FormData): ClubAnnouncementRecordInput {
@@ -192,16 +198,6 @@ function parseGalleryInput(formData: FormData): ClubGalleryRecordInput {
     visibility: parseVisibility(formData),
     featured: parseCheckbox(formData, "featured"),
   };
-}
-
-function getActionModuleKey(formData: FormData): ClubContentModuleKey {
-  const raw = String(formData.get("moduleKey") ?? "").trim();
-
-  if (raw === "announcements" || raw === "events" || raw === "gallery") {
-    return raw;
-  }
-
-  return parseContentModuleKey(formData);
 }
 
 export async function createClubAnnouncementAction(formData: FormData) {
@@ -347,8 +343,4 @@ export async function deleteClubGalleryAction(formData: FormData) {
   await deleteClubGalleryRecord(clubSlug, currentSlug);
   revalidateClubContentPaths(clubSlug, "gallery");
   redirect(`${buildClubModuleListHref(clubSlug, "gallery")}?state=deleted`);
-}
-
-export function normalizeClubContentModuleKey(formData: FormData): ClubContentModuleKey {
-  return getActionModuleKey(formData);
 }

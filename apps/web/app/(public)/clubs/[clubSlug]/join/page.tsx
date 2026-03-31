@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { HeroCard, PageShell, StatusPill, SurfaceCard } from "@ysplan/ui";
 
 import { buildClubAppHomeHref } from "../../../../../src/lib/club-app-routes";
+import { getDisplayClub } from "../../../../../src/lib/club-copy";
 import {
   createClubJoinRequest,
   getLatestClubJoinRequestForUser,
@@ -52,23 +53,15 @@ async function requestClubJoinAction(formData: FormData) {
     redirect(`/clubs/${access.club.slug}?state=already-pending`);
   }
 
-  try {
-    await createClubJoinRequest({
-      clubSlug: access.club.slug,
-      clubName: access.club.name,
-      requesterUserId: session.userId,
-      requesterDisplayName: session.displayName,
-      requesterEmail: session.email,
-      requesterPlatformRole: session.platformRole,
-      introMessage: introMessage || "활동 흐름과 분위기가 잘 맞을 것 같아 가입을 신청합니다.",
-    });
-  } catch (error) {
-    if (error instanceof Error && error.message === "already-member") {
-      redirect(buildClubAppHomeHref(access.club.slug));
-    }
-
-    throw error;
-  }
+  await createClubJoinRequest({
+    clubSlug: access.club.slug,
+    clubName: access.club.name,
+    requesterUserId: session.userId,
+    requesterDisplayName: session.displayName,
+    requesterEmail: session.email,
+    requesterPlatformRole: session.platformRole,
+    introMessage: introMessage || "활동 분위기와 운영 방식이 잘 맞을 것 같아 가입을 신청합니다.",
+  });
 
   redirect(`/clubs/${access.club.slug}?state=request-sent`);
 }
@@ -76,13 +69,14 @@ async function requestClubJoinAction(formData: FormData) {
 export default async function ClubJoinPage(props: ClubJoinPageProps) {
   const { clubSlug } = await props.params;
   const session = await getActivePlatformUserSession();
-  const club = await resolveClubPreviewFromSlug(clubSlug, session);
+  const clubRecord = await resolveClubPreviewFromSlug(clubSlug, session);
   const access = await getClubViewerAccess(clubSlug, session);
 
-  if (!club || !access) {
+  if (!clubRecord || !access) {
     notFound();
   }
 
+  const club = getDisplayClub(clubRecord);
   const appHref = buildClubAppHomeHref(club.slug);
   const latestRequest =
     session ? await getLatestClubJoinRequestForUser({ clubSlug: club.slug, userId: session.userId }) : null;
@@ -96,22 +90,19 @@ export default async function ClubJoinPage(props: ClubJoinPageProps) {
         mode="public"
         eyebrow="클럽 입장"
         title={`${club.name} 멤버입니다`}
-        subtitle="이미 승인된 계정입니다. 바로 클럽 안으로 들어가서 모듈을 사용할 수 있습니다."
+        subtitle="바로 멤버 공간으로 들어가 최근 공지와 일정, 갤러리 흐름을 확인할 수 있습니다."
         actions={
           <div className="inline-actions">
             <Link className="button button--primary" href={appHref}>
               클럽 들어가기
             </Link>
             <Link className="button button--ghost" href={`/clubs/${club.slug}`}>
-              소개 보기
+              공개 보기
             </Link>
           </div>
         }
       >
-        <SurfaceCard
-          title="바로 사용할 수 있는 상태"
-          description="공지, 이벤트, 갤러리, FAQ 같은 클럽 모듈을 지금 바로 읽고 사용할 수 있습니다."
-        />
+        <SurfaceCard title="이미 참여 중입니다" description="클럽 홈과 게시판이 바로 열리는 상태입니다." />
       </PageShell>
     );
   }
@@ -122,7 +113,7 @@ export default async function ClubJoinPage(props: ClubJoinPageProps) {
         mode="public"
         eyebrow="가입 안내"
         title={`${club.name}는 초대 우선 클럽입니다`}
-        subtitle="관리자 초대가 있어야 참가할 수 있습니다. 공개 소개 화면에서 운영 방식을 먼저 확인해 주세요."
+        subtitle="운영진 초대가 있어야 참여할 수 있습니다. 공개 페이지에서 분위기와 규칙을 먼저 확인해 주세요."
         actions={
           <div className="inline-actions">
             <Link className="button button--ghost" href={`/clubs/${club.slug}`}>
@@ -134,10 +125,7 @@ export default async function ClubJoinPage(props: ClubJoinPageProps) {
           </div>
         }
       >
-        <SurfaceCard
-          title="초대 방식"
-          description="이 클럽은 공개 신청 버튼 대신 관리자 초대 또는 별도 승인 절차를 사용합니다."
-        />
+        <SurfaceCard title="초대 방식" description="공개 신청 버튼 대신 운영진 초대 또는 승인된 링크를 사용합니다." />
       </PageShell>
     );
   }
@@ -147,7 +135,7 @@ export default async function ClubJoinPage(props: ClubJoinPageProps) {
       mode="public"
       eyebrow="가입 신청"
       title={`${club.name} 가입 신청`}
-      subtitle="로그인한 계정으로 가입 신청을 보내면 운영자가 확인한 뒤 멤버로 승인합니다."
+      subtitle="로그인한 계정으로 신청을 보내고, 운영진 승인 후 멤버 공간으로 들어갈 수 있습니다."
       actions={
         <div className="inline-actions">
           <Link className="button button--ghost" href={`/clubs/${club.slug}`}>
@@ -160,9 +148,9 @@ export default async function ClubJoinPage(props: ClubJoinPageProps) {
       }
     >
       <HeroCard
-        eyebrow="신청 방식"
-        title="신청 상태가 분명하게 보이고, 승인되면 바로 클럽으로 들어갈 수 있게 연결합니다."
-        subtitle="정회원이든 준회원이든 신청은 가능하지만, 실제 이용은 운영자 승인 이후부터 열립니다."
+        eyebrow="가입 흐름"
+        title="신청 상태가 분명하게 보이고, 승인되면 바로 클럽으로 이어집니다"
+        subtitle="정회원이든 준회원이든 신청은 가능하지만 실제 이용은 운영진 승인 이후 열립니다."
         meta={
           <>
             <StatusPill tone="accent">{club.accessLabel}</StatusPill>
@@ -173,10 +161,10 @@ export default async function ClubJoinPage(props: ClubJoinPageProps) {
       />
 
       <div className="grid-two">
-        <SurfaceCard title="가입 신청" description="간단한 소개만 남겨도 충분합니다.">
+        <SurfaceCard title="가입 신청">
           {hasPendingRequest ? (
             <div className="surface-stack">
-              <p className="feature-copy">이미 가입 신청을 보냈습니다. 운영자 승인 결과를 기다려 주세요.</p>
+              <p className="feature-copy">이미 가입 신청을 보냈습니다. 운영진 승인 결과를 기다려 주세요.</p>
               <div className="inline-actions">
                 <Link className="button button--secondary" href={`/clubs/${club.slug}`}>
                   상세 보기
@@ -190,7 +178,7 @@ export default async function ClubJoinPage(props: ClubJoinPageProps) {
                 간단한 소개
                 <textarea
                   className="text-input text-input--tall"
-                  defaultValue="활동 흐름과 분위기가 잘 맞을 것 같아 가입을 신청합니다."
+                  defaultValue="활동 분위기와 운영 방식이 잘 맞을 것 같아 가입을 신청합니다."
                   name="introMessage"
                 />
               </label>
@@ -218,27 +206,27 @@ export default async function ClubJoinPage(props: ClubJoinPageProps) {
           )}
         </SurfaceCard>
 
-        <SurfaceCard title="진행 순서" description="신청 전후에 지금 어떤 상태인지 쉽게 확인할 수 있습니다.">
+        <SurfaceCard title="진행 순서">
           <ol className="journey-list">
             <li className="journey-list__item">
               <span className="journey-list__number">1</span>
               <div>
                 <strong>로그인</strong>
-                <p className="feature-copy">플랫폼 계정으로 먼저 들어옵니다.</p>
+                <p className="feature-copy">플랫폼 계정으로 먼저 들어갑니다.</p>
               </div>
             </li>
             <li className="journey-list__item">
               <span className="journey-list__number">2</span>
               <div>
                 <strong>가입 신청</strong>
-                <p className="feature-copy">간단한 소개를 남기고 신청을 보냅니다.</p>
+                <p className="feature-copy">짧은 소개를 남기고 신청을 보냅니다.</p>
               </div>
             </li>
             <li className="journey-list__item">
               <span className="journey-list__number">3</span>
               <div>
                 <strong>승인 후 입장</strong>
-                <p className="feature-copy">승인되면 소개 화면과 이 화면에서 바로 클럽으로 들어갈 수 있습니다.</p>
+                <p className="feature-copy">승인되면 공개 페이지와 멤버 공간에서 바로 들어갈 수 있습니다.</p>
               </div>
             </li>
           </ol>

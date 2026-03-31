@@ -1,4 +1,4 @@
-import { randomUUID } from "node:crypto";
+﻿import { randomUUID } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -142,8 +142,8 @@ function createDefaultClubSnapshot(): ClubContentSnapshot {
     {
       slug: "this-week-notice",
       title: "이번 주 운영 공지",
-      summary: "이번 주 공지와 확인 사항만 빠르게 보이게 정리했습니다.",
-      body: "이번 주는 주중 저녁 모임과 주말 정리 일정이 있습니다. 참가 여부만 눌러 주세요.",
+      summary: "이번 주 공지와 확인 사항만 빠르게 볼 수 있게 정리했습니다.",
+      body: "이번 주에는 주중 정기 모임과 주말 정리 일정이 있습니다. 참가 여부만 눌러 주세요.",
       severity: "important",
       visibility: "member",
       pinned: true,
@@ -152,8 +152,8 @@ function createDefaultClubSnapshot(): ClubContentSnapshot {
     {
       slug: "welcome-guide",
       title: "새 멤버 안내",
-      summary: "처음 들어온 멤버가 바로 따라할 수 있게 핵심만 묶었습니다.",
-      body: "게시판은 공지, 일정, 갤러리 세 개가 기본입니다. 새 글은 상단 `새로 만들기`에서 작성하세요.",
+      summary: "처음 들어온 멤버가 바로 따라올 수 있게 핵심 동선만 묶어둔 안내입니다.",
+      body: "게시판은 공지, 일정, 갤러리 세 가지가 기본입니다. 첫 글은 상단 새로 만들기에서 작성해 주세요.",
       severity: "normal",
       visibility: "public",
       pinned: false,
@@ -164,11 +164,11 @@ function createDefaultClubSnapshot(): ClubContentSnapshot {
   const eventSeed: Array<Omit<ClubEventRecord, "id" | "createdAt" | "updatedAt">> = [
     {
       slug: "evening-meeting",
-      title: "저녁 정기 모임",
-      summary: "이번 주 모임은 짧게 시작해서 후기 정리까지 한 번에 진행합니다.",
+      title: "정기 모임",
+      summary: "이번 주 모임은 천천히 시작해서 후기 정리까지 한 번에 진행합니다.",
       startsAt: "2026-03-24T19:30:00.000Z",
       endsAt: "2026-03-24T21:00:00.000Z",
-      location: "동네 커뮤니티실",
+      location: "성내 커뮤니티룸",
       attendanceTarget: 12,
       visibility: "member",
       featured: true,
@@ -176,7 +176,7 @@ function createDefaultClubSnapshot(): ClubContentSnapshot {
     {
       slug: "weekend-walk",
       title: "주말 산책 일정",
-      summary: "가볍게 만나는 오픈 일정입니다. 늦지 않게 출발만 확인하세요.",
+      summary: "가볍게 만나서 걷는 오픈 일정입니다. 처음 오는 분도 편하게 합류할 수 있어요.",
       startsAt: "2026-03-29T09:00:00.000Z",
       endsAt: "2026-03-29T10:30:00.000Z",
       location: "한강 산책로",
@@ -190,7 +190,7 @@ function createDefaultClubSnapshot(): ClubContentSnapshot {
     {
       slug: "spring-crew-photo",
       title: "봄 모임 사진",
-      caption: "가벼운 분위기와 핵심 장면만 보이게 정리한 최근 사진입니다.",
+      caption: "가벼운 분위기와 동선 장면만 보이게 정리한 최근 사진입니다.",
       photoCount: 14,
       noteCount: 6,
       visibility: "member",
@@ -199,7 +199,7 @@ function createDefaultClubSnapshot(): ClubContentSnapshot {
     {
       slug: "weekend-highlight",
       title: "주말 하이라이트",
-      caption: "처음 보는 사람도 분위기를 알 수 있게 대표 장면만 올렸습니다.",
+      caption: "처음 보는 사람도 분위기를 바로 알 수 있게 대표 장면만 올려둔 앨범입니다.",
       photoCount: 8,
       noteCount: 2,
       imageUrl: "https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=1200&q=80",
@@ -373,7 +373,7 @@ function normalizeRequiredIso(value: string, fieldLabel: string): string {
   const normalized = normalizeOptionalIso(value);
 
   if (!normalized) {
-    throw new Error(`${fieldLabel}을(를) 입력해 주세요.`);
+    throw new Error(`${fieldLabel}을 입력해 주세요.`);
   }
 
   return normalized;
@@ -414,7 +414,7 @@ export function getClubEventWindowLabel(record: Pick<ClubEventRecord, "startsAt"
   const end = new Date(record.endsAt);
 
   if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
-    return "시간 미정";
+    return "?쒓컙 誘몄젙";
   }
 
   const format = new Intl.DateTimeFormat("ko-KR", {
@@ -482,7 +482,7 @@ async function updateRecord<TRecord extends { slug: string; updatedAt: string }>
   buildNext: (current: TRecord, nextSlug: string) => TRecord,
   title: string,
   explicitSlug?: string,
-  missingMessage = "수정할 항목을 찾지 못했습니다.",
+  missingMessage = "?섏젙????ぉ??李얠? 紐삵뻽?듬땲??",
 ): Promise<TRecord> {
   const { store, snapshot, normalizedClubSlug } = await ensureClubSnapshot(clubSlug);
   const records = getRecords(snapshot);
@@ -579,7 +579,7 @@ export async function updateClubAnnouncementRecord(
     }),
     input.title,
     input.slug,
-    "수정할 공지를 찾지 못했습니다.",
+    "?섏젙??怨듭?瑜?李얠? 紐삵뻽?듬땲??",
   );
 }
 
@@ -615,8 +615,8 @@ export async function createClubEventRecord(
       slug: nextSlug,
       title: input.title,
       summary: input.summary,
-      startsAt: normalizeRequiredIso(input.startsAt, "시작 시간"),
-      endsAt: normalizeRequiredIso(input.endsAt, "종료 시간"),
+      startsAt: normalizeRequiredIso(input.startsAt, "?쒖옉 ?쒓컙"),
+      endsAt: normalizeRequiredIso(input.endsAt, "醫낅즺 ?쒓컙"),
       location: input.location,
       ...(input.attendanceTarget !== undefined ? { attendanceTarget: input.attendanceTarget } : {}),
       visibility: input.visibility,
@@ -645,8 +645,8 @@ export async function updateClubEventRecord(
       slug: nextSlug,
       title: input.title,
       summary: input.summary,
-      startsAt: normalizeRequiredIso(input.startsAt, "시작 시간"),
-      endsAt: normalizeRequiredIso(input.endsAt, "종료 시간"),
+      startsAt: normalizeRequiredIso(input.startsAt, "?쒖옉 ?쒓컙"),
+      endsAt: normalizeRequiredIso(input.endsAt, "醫낅즺 ?쒓컙"),
       location: input.location,
       ...(input.attendanceTarget !== undefined ? { attendanceTarget: input.attendanceTarget } : {}),
       visibility: input.visibility,
@@ -740,4 +740,109 @@ export async function deleteClubGalleryRecord(clubSlug: string, slug: string): P
     (snapshot) => snapshot.gallery,
     (snapshot, records) => ({ ...snapshot, gallery: records }),
   );
+}
+
+function createReadableSeedSnapshot(clubSlug: string): ClubContentSnapshot {
+  const now = new Date().toISOString();
+  const safeClubSlug = normalizeClubSlug(clubSlug);
+
+  return {
+    announcements: [
+      {
+        id: `club-announcement-${randomUUID()}`,
+        slug: "welcome-notice",
+        title: "첫 안내",
+        summary: "새 멤버가 들어오면 가장 먼저 보게 될 공지입니다.",
+        body: "이 공간에서는 공지, 일정, 갤러리를 중심으로 모임 흐름을 관리합니다. 첫 글은 상단 버튼에서 바로 만들 수 있습니다.",
+        severity: "important",
+        visibility: "member",
+        pinned: true,
+        featured: true,
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        id: `club-announcement-${randomUUID()}`,
+        slug: `${safeClubSlug}-open-note`,
+        title: "공개 안내",
+        summary: "공개 페이지에서 먼저 보여줄 소개용 공지입니다.",
+        body: "가입 신청 전에는 공개 페이지와 공개 공지만 볼 수 있습니다. 승인 후에는 멤버 공간에서 전체 게시판을 사용할 수 있습니다.",
+        severity: "normal",
+        visibility: "public",
+        pinned: false,
+        featured: false,
+        createdAt: now,
+        updatedAt: now,
+      },
+    ],
+    events: [
+      {
+        id: `club-event-${randomUUID()}`,
+        slug: "weekly-meetup",
+        title: "주간 모임",
+        summary: "이번 주 기본 일정 샘플입니다. 날짜와 장소를 바로 바꿔 쓰면 됩니다.",
+        startsAt: "2026-04-02T11:00:00.000Z",
+        endsAt: "2026-04-02T13:00:00.000Z",
+        location: "메인 모임 장소",
+        attendanceTarget: 12,
+        visibility: "member",
+        featured: true,
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        id: `club-event-${randomUUID()}`,
+        slug: "open-session",
+        title: "공개 체험 일정",
+        summary: "방문자에게 먼저 보여줄 공개 일정입니다.",
+        startsAt: "2026-04-05T09:00:00.000Z",
+        endsAt: "2026-04-05T10:30:00.000Z",
+        location: "야외 집결지",
+        attendanceTarget: 8,
+        visibility: "public",
+        featured: false,
+        createdAt: now,
+        updatedAt: now,
+      },
+    ],
+    gallery: [
+      {
+        id: `club-gallery-${randomUUID()}`,
+        slug: "first-album",
+        title: "첫 활동 앨범",
+        caption: "처음 올리는 앨범 샘플입니다. 사진 수와 메모 수만 바꿔도 바로 테스트할 수 있습니다.",
+        photoCount: 12,
+        noteCount: 4,
+        visibility: "member",
+        featured: true,
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        id: `club-gallery-${randomUUID()}`,
+        slug: "open-gallery",
+        title: "공개 갤러리",
+        caption: "방문자가 볼 수 있는 대표 장면만 모아둔 앨범입니다.",
+        photoCount: 6,
+        noteCount: 1,
+        imageUrl: "https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=1200&q=80",
+        visibility: "public",
+        featured: false,
+        createdAt: now,
+        updatedAt: now,
+      },
+    ],
+  };
+}
+
+export async function seedClubContentSnapshot(clubSlug: string): Promise<void> {
+  const normalizedClubSlug = normalizeClubSlug(clubSlug);
+  const store = await readStore();
+
+  if (store.clubs[normalizedClubSlug]) {
+    return;
+  }
+
+  store.clubs[normalizedClubSlug] = createReadableSeedSnapshot(normalizedClubSlug);
+  await writeStore(store);
 }

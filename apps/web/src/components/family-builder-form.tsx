@@ -28,17 +28,17 @@ const familyHomePresetOptions: Array<{
   {
     key: "balanced",
     label: "균형형 홈",
-    description: "공지, 일정, 최근 기록을 고르게 섞어 보여주는 기본 홈입니다.",
+    description: "공지, 일정, 기록을 고르게 보여줍니다.",
   },
   {
     key: "planner",
     label: "플래너형 홈",
-    description: "오늘 해야 할 일과 일정 카드를 먼저 보여주는 실행형 홈입니다.",
+    description: "오늘 할 일과 일정이 먼저 보입니다.",
   },
   {
     key: "story",
     label: "기록형 홈",
-    description: "사진, 글, 최근 기록 흐름이 더 잘 보이는 스토리형 홈입니다.",
+    description: "사진과 글을 중심으로 보여줍니다.",
   },
 ];
 
@@ -50,12 +50,12 @@ const familyEntryPresetOptions: Array<{
   {
     key: "guided",
     label: "안내형 입장",
-    description: "가족홈 분위기와 주요 모듈을 먼저 보여주고 입장 확인으로 이어집니다.",
+    description: "처음 들어오는 사람에게 필요한 안내를 먼저 보여줍니다.",
   },
   {
     key: "direct",
     label: "바로 입장",
-    description: "입구에서 바로 비밀번호나 코드를 확인하는 빠른 흐름입니다.",
+    description: "비밀번호만 확인하고 바로 들어갑니다.",
   },
 ];
 
@@ -139,8 +139,8 @@ export function FamilyBuilderForm({
       <input name="enabledModules" type="hidden" value={orderedEnabledModules.join(",")} />
 
       <SurfaceCard
-        title="홈 프리셋"
-        description={`${familyName} 첫 화면에서 어떤 정보가 먼저 눈에 들어올지 정합니다.`}
+        title="홈 구성"
+        description={`${familyName} 첫 화면에 어떤 정보가 먼저 보일지 정합니다.`}
         badge={<StatusPill tone="accent">{selectedHomePreset.label}</StatusPill>}
       >
         <div className="builder-option-grid">
@@ -159,8 +159,8 @@ export function FamilyBuilderForm({
       </SurfaceCard>
 
       <SurfaceCard
-        title="입장 흐름"
-        description="가족 입구에서 안내를 먼저 보여줄지, 바로 입장 확인으로 보낼지 정합니다."
+        title="입장 방식"
+        description="가족홈 입구에서 보이는 흐름을 정합니다."
         badge={<StatusPill>{selectedEntryPreset.label}</StatusPill>}
       >
         <div className="builder-option-grid builder-option-grid--compact">
@@ -179,30 +179,24 @@ export function FamilyBuilderForm({
       </SurfaceCard>
 
       <SurfaceCard
-        title="공통 테마 10종"
-        description="가족홈과 클럽이 같은 테마 자산을 공유합니다. 색, 폰트, 분위기를 카드에서 바로 비교하고 고를 수 있습니다."
+        title="공통 테마"
+        description="가족홈과 클럽에서 함께 쓸 수 있는 테마를 고릅니다."
         badge={<StatusPill tone="warm">{selectedThemePreset.label}</StatusPill>}
       >
         <p className="helper-text">{selectedThemePreset.mood}</p>
-        <ThemePresetSelector
-          compact
-          name="themePreset"
-          onChange={setThemePreset}
-          value={themePreset}
-        />
+        <ThemePresetSelector compact name="themePreset" onChange={setThemePreset} value={themePreset} />
       </SurfaceCard>
 
       <SurfaceCard
         className="builder-stack-card"
         title="모듈 구성"
-        description="체크해서 켜고 끄고, 위아래 버튼이나 드래그로 실제 노출 순서를 조절합니다."
+        description="체크로 켜고 끄고, 순서 버튼이나 드래그로 정리합니다."
         badge={<StatusPill tone="warm">{orderedEnabledModules.length}개 사용 중</StatusPill>}
       >
         {orderedEnabledModules.length > 0 ? (
           <div className="pill-row">
             {orderedEnabledModules.map((moduleKey) => {
               const module = moduleCatalog.find((candidate) => candidate.key === moduleKey);
-
               return (
                 <span className="module-pill" key={moduleKey}>
                   {module?.label ?? moduleKey}
@@ -212,7 +206,7 @@ export function FamilyBuilderForm({
           </div>
         ) : (
           <div className="builder-empty">
-            최소 한 개 이상은 켜 두는 편이 좋습니다. 모두 끄면 첫 화면이 너무 비어 보일 수 있습니다.
+            사용 중인 모듈이 없습니다. 하나 이상 켜면 첫 화면에 보여집니다.
           </div>
         )}
 
@@ -259,28 +253,22 @@ export function FamilyBuilderForm({
                   <div className="builder-module__actions">
                     <StatusPill>{module.kind}</StatusPill>
                     <button
-                      className="button button--secondary button--small"
+                      className="button button--ghost button--small"
+                      disabled={index === 0}
                       onClick={() => handleMoveModule(module.key, -1)}
                       type="button"
                     >
                       위로
                     </button>
                     <button
-                      className="button button--secondary button--small"
+                      className="button button--ghost button--small"
+                      disabled={index === moduleOrder.length - 1}
                       onClick={() => handleMoveModule(module.key, 1)}
                       type="button"
                     >
                       아래로
                     </button>
-                    <span aria-hidden="true" className="builder-module__handle">
-                      드래그
-                    </span>
                   </div>
-                </div>
-
-                <div className="builder-module__meta">
-                  <span>노출 순서 {index + 1}</span>
-                  <span>{isEnabled ? "사용 중" : "꺼짐"}</span>
                 </div>
               </li>
             );

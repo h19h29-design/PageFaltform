@@ -11,6 +11,7 @@ import {
   countOwnedCustomClubSites,
   getCustomClubCreationLimit,
 } from "../../../../../src/lib/club-sites-store";
+import { getClubModuleCopy } from "../../../../../src/lib/club-copy";
 import { familyThemePresetOptions } from "../../../../../src/lib/shared-themes";
 import { getActiveConsoleSession } from "../../../../../src/lib/server-sessions";
 
@@ -40,13 +41,13 @@ export default async function NewClubPage(props: NewClubPageProps) {
   return (
     <PageShell
       mode="console"
-      eyebrow="새 클럽 만들기"
+      eyebrow="클럽 만들기"
       title="B-page 클럽 생성"
-      subtitle="클럽 하나를 만들고 공개 흐름을 바로 테스트합니다."
+      subtitle="클럽 이름, 공개 범위, 입장 방식, 사용할 게시판을 한 번에 정합니다."
       actions={
         <div className="inline-actions">
           <Link className="button button--ghost" href="/console">
-            뒤로
+            돌아가기
           </Link>
         </div>
       }
@@ -60,12 +61,11 @@ export default async function NewClubPage(props: NewClubPageProps) {
       <div className="grid-two">
         <SurfaceCard
           title="생성 권한"
-          description="정회원은 클럽을 최대 3개까지, 마스터는 테스트 기간 동안 제한 없이 만들 수 있습니다."
           badge={<StatusPill tone="accent">{getPlatformAccountRoleLabel(consoleSession.platformRole)}</StatusPill>}
         >
           <dl className="fact-grid">
             <div className="fact-grid__item">
-              <dt>이미 만든 클럽</dt>
+              <dt>내가 만든 클럽</dt>
               <dd>{ownedClubCount}개</dd>
             </div>
             <div className="fact-grid__item">
@@ -75,14 +75,10 @@ export default async function NewClubPage(props: NewClubPageProps) {
           </dl>
         </SurfaceCard>
 
-        <SurfaceCard
-          title="생성 후 테스트 주소"
-          description="클럽을 만들면 아래 주소들에서 바로 공개 흐름을 확인할 수 있습니다."
-          badge={<StatusPill tone="warm">즉시 확인</StatusPill>}
-        >
+        <SurfaceCard title="테스트 주소">
           <ul className="stack-list">
             <li>
-              <code>/clubs/{`{slug}`}</code> 공개 상세
+              <code>/clubs/{`{slug}`}</code> 공개 페이지
             </li>
             <li>
               <code>/clubs/{`{slug}`}/join</code> 가입 신청
@@ -99,22 +95,22 @@ export default async function NewClubPage(props: NewClubPageProps) {
 
       <form action={createClubSiteAction} className="surface-stack">
         <div className="grid-two">
-          <SurfaceCard title="클럽 기본 정보" description="클럽 이름과 첫인상 문구를 정합니다.">
+          <SurfaceCard title="클럽 기본 정보">
             <div className="form-stack">
               <label className="form-label">
                 클럽 이름
-                <input className="text-input" name="name" placeholder="한강 새벽 러닝" required type="text" />
+                <input className="text-input" name="name" placeholder="한강 나이트런" required type="text" />
               </label>
               <label className="form-label">
                 주소 슬러그
-                <input className="text-input" name="slug" placeholder="hangang-dawn-run" required type="text" />
+                <input className="text-input" name="slug" placeholder="hangang-night-run" required type="text" />
               </label>
               <label className="form-label">
-                한 줄 소개
+                짧은 소개
                 <input
                   className="text-input"
                   name="tagline"
-                  placeholder="주간 러닝 일정과 활동 기록을 함께 보는 모임"
+                  placeholder="매주 모여서 달리는 동네 러닝 클럽"
                   required
                   type="text"
                 />
@@ -124,14 +120,14 @@ export default async function NewClubPage(props: NewClubPageProps) {
                 <textarea
                   className="text-input text-input--tall"
                   name="description"
-                  placeholder="클럽의 분위기와 운영 방식이 한 번에 보이게 적어주세요."
+                  placeholder="클럽 분위기와 활동 방식을 간단히 적어주세요."
                   required
                 />
               </label>
             </div>
           </SurfaceCard>
 
-          <SurfaceCard title="운영 설정" description="공개 범위, 가입 정책, 테마, 활동 정보를 정합니다.">
+          <SurfaceCard title="운영 설정">
             <div className="form-stack">
               <label className="form-label">
                 종목 이름
@@ -139,24 +135,24 @@ export default async function NewClubPage(props: NewClubPageProps) {
               </label>
               <label className="form-label">
                 활동 지역
-                <input className="text-input" name="location" placeholder="서울 사의동" required type="text" />
+                <input className="text-input" name="location" placeholder="서울 한강" required type="text" />
               </label>
               <label className="form-label">
-                현재 집중 포인트
+                현재 집중 주제
                 <input
                   className="text-input"
                   name="currentFocus"
-                  placeholder="4월 5km 기록 개선 챌린지"
+                  placeholder="4주간 5km 꾸준히 뛰기"
                   required
                   type="text"
                 />
               </label>
               <label className="form-label">
-                다음 일정 라벨
+                다음 일정 문구
                 <input
                   className="text-input"
                   name="nextEventLabel"
-                  placeholder="목요일 20:00 사의천 5km"
+                  placeholder="목요일 20:00 한강 집결"
                   required
                   type="text"
                 />
@@ -169,10 +165,10 @@ export default async function NewClubPage(props: NewClubPageProps) {
                 </select>
               </label>
               <label className="form-label">
-                가입 정책
+                가입 방식
                 <select className="text-input" defaultValue="approval-required" name="joinPolicy">
-                  <option value="approval-required">로그인 후 신청, 운영자 승인</option>
-                  <option value="invite-first">초대제 전용</option>
+                  <option value="approval-required">가입 신청 후 승인</option>
+                  <option value="invite-first">초대 우선</option>
                 </select>
               </label>
               <label className="form-label">
@@ -189,19 +185,20 @@ export default async function NewClubPage(props: NewClubPageProps) {
           </SurfaceCard>
         </div>
 
-        <SurfaceCard
-          title="먼저 보여줄 모듈"
-          description="초기 클럽 공개 화면에 바로 보일 모듈만 먼저 켭니다. 나중에 관리자 화면에서 바꿀 수 있습니다."
-        >
+        <SurfaceCard title="처음 노출할 게시판">
           <div className="content-checkbox-grid">
-            {clubModuleCatalog.map((module, index) => (
-              <label className="content-checkbox" key={module.key}>
-                <input defaultChecked={index < 4} name={`module-${module.key}`} type="checkbox" value={module.key} />
-                <span>
-                  <strong>{module.label}</strong> {module.description}
-                </span>
-              </label>
-            ))}
+            {clubModuleCatalog.map((module, index) => {
+              const moduleCopy = getClubModuleCopy(module.key);
+
+              return (
+                <label className="content-checkbox" key={module.key}>
+                  <input defaultChecked={index < 4} name={`module-${module.key}`} type="checkbox" value={module.key} />
+                  <span>
+                    <strong>{moduleCopy.label}</strong> {moduleCopy.description}
+                  </span>
+                </label>
+              );
+            })}
           </div>
         </SurfaceCard>
 
@@ -210,7 +207,7 @@ export default async function NewClubPage(props: NewClubPageProps) {
             클럽 만들기
           </button>
           <Link className="button button--secondary" href="/clubs">
-            공개 클럽 먼저 보기
+            공개 클럽 목록
           </Link>
         </div>
       </form>

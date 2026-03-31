@@ -11,13 +11,13 @@ import {
   saveFamilyWorkspaceAction,
 } from "./actions";
 import { FamilyBuilderForm } from "../../../../../src/components/family-builder-form";
+import { buildFamilyMobilePreviewHref } from "../../../../../src/lib/family-app-routes";
 import { listFamilyJoinRequestsForFamily } from "../../../../../src/lib/family-join-requests";
 import { getConsoleFamilyBySlug } from "../../../../../src/lib/family-sites-store";
 import {
   getEffectiveFamilyWorkspace,
   getFamilyWorkspaceSummary,
 } from "../../../../../src/lib/family-workspace";
-import { buildFamilyMobilePreviewHref } from "../../../../../src/lib/family-app-routes";
 import { getActiveConsoleSession } from "../../../../../src/lib/server-sessions";
 
 type FamilyBuilderPageProps = {
@@ -28,15 +28,15 @@ type FamilyBuilderPageProps = {
 function getStateMessage(state?: string): string | null {
   switch (state) {
     case "saved":
-      return "가족홈 설정을 저장했습니다. 공개 범위, 모듈 순서, 테마가 바로 반영됩니다.";
+      return "가족 설정을 저장했습니다. 공개 범위, 모듈 순서, 테마가 바로 반영됩니다.";
     case "reset":
-      return "가족홈 설정을 기본값으로 되돌렸습니다.";
+      return "가족 설정을 기본값으로 되돌렸습니다.";
     case "created":
-      return "새 가족홈을 만들었습니다. 이제 공개 범위와 모듈 구성을 조절해보세요.";
+      return "새 가족홈을 만들었습니다. 이제 공개 범위와 모듈 구성을 조정해 보세요.";
     case "request-approved":
-      return "가입 요청을 승인했습니다.";
+      return "가입 신청을 승인했습니다.";
     case "request-rejected":
-      return "가입 요청을 거절했습니다.";
+      return "가입 신청을 거절했습니다.";
     default:
       return null;
   }
@@ -78,16 +78,16 @@ export default async function FamilyBuilderPage(props: FamilyBuilderPageProps) {
   return (
     <PageShell
       mode="console"
-      eyebrow="가족홈 설정"
+      eyebrow="가족 설정"
       title={`${workspaceView.family.name} 관리`}
-      subtitle="운영 설정과 승인만 다룹니다."
+      subtitle="가족홈의 공개 범위와 모듈 구성을 여기서 바로 조정합니다."
       actions={
         <div className="inline-actions">
           <Link className="button button--ghost" href="/console">
-            뒤로
+            돌아가기
           </Link>
           <Link className="button button--secondary" href={buildFamilyMobilePreviewHref(workspaceView.family.slug)}>
-            모바일 미리보기
+            모바일 보기
           </Link>
           <Link className="button button--primary" href={`/app/${workspaceView.family.slug}`}>
             홈 보기
@@ -96,35 +96,36 @@ export default async function FamilyBuilderPage(props: FamilyBuilderPageProps) {
       }
     >
       <HeroCard
-        eyebrow={workspaceView.family.source === "custom" ? "사용자 가족홈" : "기본 샘플 가족홈"}
+        eyebrow={workspaceView.family.source === "custom" ? "직접 만든 가족홈" : "기본 샘플 가족홈"}
         title={`${workspaceView.family.name} 설정 보드`}
         subtitle={getFamilyWorkspaceSummary(workspaceView)}
         meta={
           <>
-            <StatusPill tone="accent">{familyAccess.role}</StatusPill>
+            <StatusPill tone="accent">{familyAccess.canManage ? "관리 가능" : "참여 중"}</StatusPill>
             <StatusPill>{workspaceView.family.visibility === "private" ? "비공개" : "공개"}</StatusPill>
             <StatusPill tone="warm">{workspaceView.themePresetLabel}</StatusPill>
-            <StatusPill>{joinRequests.length}건 요청 대기</StatusPill>
+            <StatusPill>{joinRequests.length}건 대기</StatusPill>
           </>
         }
       >
-        <SurfaceCard title="현재 운영 요약" description="먼저 확인할 핵심 상태만 압축해서 보여줍니다.">
+        <SurfaceCard title="현재 상태">
           <MetricList
             items={[
               {
-                label: "활성 모듈",
+                label: "사용 중인 모듈",
                 value: `${workspaceView.workspace.enabledModules.length}개`,
               },
               {
                 label: "공개 범위",
-                value: workspaceView.family.visibility === "private" ? "가입자만 보기" : "공개 미리보기",
+                value:
+                  workspaceView.family.visibility === "private" ? "가족만 보기" : "공개로 보기",
               },
               {
                 label: "첫 모듈",
                 value: workspaceView.moduleDescriptors[0]?.label ?? "공지",
               },
               {
-                label: "가입 요청",
+                label: "가입 신청",
                 value: `${joinRequests.length}건`,
               },
             ]}
@@ -140,8 +141,7 @@ export default async function FamilyBuilderPage(props: FamilyBuilderPageProps) {
 
       <div className="grid-two builder-summary-grid">
         <SurfaceCard
-          title="운영 옵션"
-          description="가족홈 공개 범위와 현재 적용 중인 프리셋 상태입니다."
+          title="홈 설정"
           badge={
             <StatusPill tone={workspaceView.family.visibility === "private" ? "danger" : "accent"}>
               {workspaceView.family.visibility === "private" ? "비공개" : "공개"}
@@ -149,27 +149,23 @@ export default async function FamilyBuilderPage(props: FamilyBuilderPageProps) {
           }
         >
           <p className="feature-copy">
-            홈 프리셋은 <strong>{workspaceView.homePresetLabel}</strong>, 입장 프리셋은{" "}
+            홈 구성은 <strong>{workspaceView.homePresetLabel}</strong>, 입장 방식은{" "}
             <strong>{workspaceView.entryPresetLabel}</strong>입니다.
           </p>
           <p className="feature-copy">
-            테마는 <strong>{workspaceView.themePresetLabel}</strong>입니다.
+            지금 적용된 테마는 <strong>{workspaceView.themePresetLabel}</strong>입니다.
           </p>
         </SurfaceCard>
 
-        <SurfaceCard
-          title="테스트 주소"
-          description="저장 후 바로 확인할 기본 경로입니다."
-          badge={<StatusPill tone="warm">즉시 반영</StatusPill>}
-        >
+        <SurfaceCard title="테스트 주소" badge={<StatusPill tone="warm">바로 확인</StatusPill>}>
           <p className="feature-copy">
             가족 입구: <strong>/f/{workspaceView.family.slug}</strong>
           </p>
           <p className="feature-copy">
-            가족 앱: <strong>/app/{workspaceView.family.slug}</strong>
+            가족 홈: <strong>/app/{workspaceView.family.slug}</strong>
           </p>
           <p className="feature-copy">
-            모바일: <strong>/preview/mobile/{workspaceView.family.slug}</strong>
+            모바일 미리보기: <strong>/preview/mobile/{workspaceView.family.slug}</strong>
           </p>
         </SurfaceCard>
       </div>
@@ -180,7 +176,7 @@ export default async function FamilyBuilderPage(props: FamilyBuilderPageProps) {
         {workspaceView.family.source === "custom" ? (
           <SurfaceCard
             title="공개 범위"
-            description="비공개로 바꾸면 가입된 사용자와 관리자만 찾고 볼 수 있습니다."
+            description="비공개로 바꾸면 가족 구성원만 볼 수 있습니다."
             tone="warm"
           >
             <label className="form-label">
@@ -191,7 +187,7 @@ export default async function FamilyBuilderPage(props: FamilyBuilderPageProps) {
               </select>
             </label>
             <p className="helper-text">
-              비공개 가족홈은 가입된 사용자와 관리자만 볼 수 있고, 공개 목록에는 나타나지 않습니다.
+              비공개 가족홈은 목록에 보이지 않고, 승인된 사람만 들어올 수 있습니다.
             </p>
           </SurfaceCard>
         ) : (
@@ -206,7 +202,7 @@ export default async function FamilyBuilderPage(props: FamilyBuilderPageProps) {
 
         <div className="builder-save-row">
           <button className="button button--primary" type="submit">
-            가족홈 설정 저장
+            가족 설정 저장
           </button>
           <Link className="button button--secondary" href={`/app/${workspaceView.family.slug}`}>
             적용 결과 보기
@@ -223,8 +219,8 @@ export default async function FamilyBuilderPage(props: FamilyBuilderPageProps) {
 
       <section className="surface-stack">
         <SurfaceCard
-          title="가입 요청 관리"
-          description="가족홈 가입 요청은 각 가족홈 정회원 또는 관리자가 승인합니다."
+          title="가입 신청 관리"
+          description="이 가족홈에 들어오려는 사람의 신청을 승인하거나 거절합니다."
           badge={<StatusPill tone={joinRequests.length > 0 ? "accent" : "warm"}>{joinRequests.length}건 대기</StatusPill>}
         >
           {joinRequests.length > 0 ? (
@@ -235,7 +231,7 @@ export default async function FamilyBuilderPage(props: FamilyBuilderPageProps) {
                     <strong>{request.requesterDisplayName}</strong> - {request.requesterEmail}
                   </p>
                   <p>
-                    계정 등급: {request.requesterPlatformRole === "full-member" ? "정회원" : "준회원"} / 요청 시각:{" "}
+                    계정 등급: {request.requesterPlatformRole === "full-member" ? "정회원" : "준회원"} / 신청 시간:{" "}
                     {request.requestedAt}
                   </p>
                   <div className="inline-actions">
@@ -258,7 +254,7 @@ export default async function FamilyBuilderPage(props: FamilyBuilderPageProps) {
               ))}
             </div>
           ) : (
-            <p className="feature-copy">지금은 대기 중인 가입 요청이 없습니다.</p>
+            <p className="feature-copy">지금은 대기 중인 가입 신청이 없습니다.</p>
           )}
         </SurfaceCard>
       </section>

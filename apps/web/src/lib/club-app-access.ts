@@ -4,13 +4,19 @@ import { redirect } from "next/navigation";
 import type { PlatformUserSession } from "@ysplan/auth";
 import type { FamilyThemePreset } from "@ysplan/platform";
 
-import { createFamilySceneStyle } from "./theme-scene";
+import {
+  buildClubAppHomeHref,
+  buildClubConsoleHref,
+  buildClubDetailHref,
+  buildClubMobilePreviewHref,
+} from "./club-app-routes";
+import { getDisplayClub, getClubModuleCopy } from "./club-copy";
 import { getSharedThemePreset } from "./shared-themes";
-import { buildClubConsoleHref, buildClubDetailHref, buildClubMobilePreviewHref } from "./club-app-routes";
+import { createFamilySceneStyle } from "./theme-scene";
 import {
   clubModuleCatalog,
-  type ClubMemberRole,
   resolveRuntimeClubFromSlug,
+  type ClubMemberRole,
   type RuntimeClubRecord,
 } from "./club-sites-store";
 import { getActivePlatformUserSession } from "./server-sessions";
@@ -60,10 +66,12 @@ function buildClubModuleEntries(club: RuntimeClubRecord): ClubAppModuleEntry[] {
         return null;
       }
 
+      const moduleCopy = getClubModuleCopy(moduleKey);
+
       return {
         moduleKey,
-        label: module.label,
-        description: module.description,
+        label: moduleCopy.label,
+        description: moduleCopy.description,
         href: `/clubs/${club.slug}/app/${moduleKey}`,
       };
     })
@@ -78,12 +86,13 @@ export function createClubAppSceneStyle(club: RuntimeClubRecord): CSSProperties 
 }
 
 export async function getClubAppAccess(clubSlug: string): Promise<ClubAppAccess | null> {
-  const club = await resolveRuntimeClubFromSlug(clubSlug);
+  const clubRecord = await resolveRuntimeClubFromSlug(clubSlug);
 
-  if (!club) {
+  if (!clubRecord) {
     return null;
   }
 
+  const club = getDisplayClub(clubRecord);
   const session = await getActivePlatformUserSession();
 
   if (!session) {
@@ -91,14 +100,18 @@ export async function getClubAppAccess(clubSlug: string): Promise<ClubAppAccess 
   }
 
   const member = club.members.find((candidate) => candidate.userId === session.userId);
-  const canManage = session.platformRole === "master" || member?.role === "owner" || member?.role === "manager";
+  const canManage =
+    session.platformRole === "master" ||
+    member?.role === "owner" ||
+    member?.role === "manager";
 
   if (!member && !canManage) {
     return null;
   }
 
   const theme = getSharedThemePreset(club.themePreset);
-  const viewerRole: ClubMemberRole | "master" = session.platformRole === "master" ? "master" : member?.role ?? "member";
+  const viewerRole: ClubMemberRole | "master" =
+    session.platformRole === "master" ? "master" : member?.role ?? "member";
 
   return {
     club,
@@ -120,6 +133,16 @@ export async function requireClubAppAccess(clubSlug: string): Promise<ClubAppAcc
 
   if (!access) {
     redirect(buildClubDetailHref(clubSlug));
+  }
+
+  return access;
+}
+
+export async function requireClubManageAccess(clubSlug: string): Promise<ClubAppAccess> {
+  const access = await requireClubAppAccess(clubSlug);
+
+  if (!access.canManage) {
+    redirect(buildClubAppHomeHref(clubSlug));
   }
 
   return access;

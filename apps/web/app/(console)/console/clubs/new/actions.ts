@@ -5,7 +5,11 @@ import { redirect } from "next/navigation";
 
 import type { FamilyThemePreset } from "@ysplan/platform";
 
-import { createCustomClubSite, clubModuleCatalog } from "../../../../../src/lib/club-sites-store";
+import { seedClubContentSnapshot } from "../../../../../src/lib/club-content-store";
+import {
+  clubModuleCatalog,
+  createCustomClubSite,
+} from "../../../../../src/lib/club-sites-store";
 import { getActiveConsoleSession } from "../../../../../src/lib/server-sessions";
 
 function parseClubModules(formData: FormData) {
@@ -50,6 +54,8 @@ export async function createClubSiteAction(formData: FormData) {
       themePreset: String(formData.get("themePreset") ?? "ocean-depths") as FamilyThemePreset,
       enabledModules: parseClubModules(formData),
     });
+
+    await seedClubContentSnapshot(club.slug);
 
     revalidatePath("/");
     revalidatePath("/club");

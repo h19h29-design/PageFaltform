@@ -1,4 +1,139 @@
 {
   "version": 1,
-  "clubs": {}
+  "clubs": {
+    "bpage-running-crew": {
+      "announcements": [
+        {
+          "id": "club-announcement-seed-running-1",
+          "slug": "welcome-notice",
+          "title": "첫 안내",
+          "summary": "B-page 러닝 크루 멤버가 가장 먼저 보면 좋은 공지입니다.",
+          "body": "이 공간에서는 공지, 일정, 갤러리를 중심으로 모임 흐름을 관리합니다. 새 글은 상단 버튼에서 바로 만들 수 있습니다.",
+          "severity": "important",
+          "visibility": "member",
+          "pinned": true,
+          "featured": true,
+          "createdAt": "2026-03-31T21:30:00.000Z",
+          "updatedAt": "2026-03-31T21:30:00.000Z"
+        },
+        {
+          "id": "club-announcement-seed-running-2",
+          "slug": "open-note",
+          "title": "공개 안내",
+          "summary": "방문자에게 먼저 보여줄 짧은 소개용 공지입니다.",
+          "body": "가입 신청 전에는 공개 페이지와 공개 공지만 볼 수 있습니다. 승인 후 멤버 공간에서 전체 게시판을 사용할 수 있습니다.",
+          "severity": "normal",
+          "visibility": "public",
+          "pinned": false,
+          "featured": false,
+          "createdAt": "2026-03-31T21:30:00.000Z",
+          "updatedAt": "2026-03-31T21:30:00.000Z"
+        }
+      ],
+      "events": [
+        {
+          "id": "club-event-seed-running-1",
+          "slug": "weekly-meetup",
+          "title": "주간 모임",
+          "summary": "4월 10km 완주 챌린지 흐름에 맞춘 기본 일정입니다.",
+          "startsAt": "2026-04-02T11:00:00.000Z",
+          "endsAt": "2026-04-02T13:00:00.000Z",
+          "location": "서울 사의",
+          "attendanceTarget": 12,
+          "visibility": "member",
+          "featured": true,
+          "createdAt": "2026-03-31T21:30:00.000Z",
+          "updatedAt": "2026-03-31T21:30:00.000Z"
+        },
+        {
+          "id": "club-event-seed-running-2",
+          "slug": "open-session",
+          "title": "공개 체험 일정",
+          "summary": "방문자에게 먼저 보여주는 공개 일정입니다.",
+          "startsAt": "2026-04-05T09:00:00.000Z",
+          "endsAt": "2026-04-05T10:30:00.000Z",
+          "location": "목요일 20:00 사의천 러닝 5km",
+          "attendanceTarget": 8,
+          "visibility": "public",
+          "featured": false,
+          "createdAt": "2026-03-31T21:30:00.000Z",
+          "updatedAt": "2026-03-31T21:30:00.000Z"
+        }
+      ],
+      "gallery": [
+        {
+          "id": "club-gallery-seed-running-1",
+          "slug": "first-album",
+          "title": "첫 활동 앨범",
+          "caption": "처음 올리는 앨범 샘플입니다. 사진 수와 메모 수를 바꾸며 바로 테스트할 수 있습니다.",
+          "photoCount": 12,
+          "noteCount": 4,
+          "visibility": "member",
+          "featured": true,
+          "createdAt": "2026-03-31T21:30:00.000Z",
+          "updatedAt": "2026-03-31T21:30:00.000Z"
+        },
+        {
+          "id": "club-gallery-seed-running-2",
+          "slug": "open-gallery",
+          "title": "공개 갤러리",
+          "caption": "방문자가 볼 수 있는 대표 장면만 모아둔 앨범입니다.",
+          "photoCount": 6,
+          "noteCount": 1,
+          "imageUrl": "https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=1200&q=80",
+          "visibility": "public",
+          "featured": false,
+          "createdAt": "2026-03-31T21:30:00.000Z",
+          "updatedAt": "2026-03-31T21:30:00.000Z"
+        }
+      ]
+    },
+    "hahahah": {
+      "announcements": [
+        {
+          "id": "club-announcement-seed-hahahah-1",
+          "slug": "welcome-notice",
+          "title": "첫 안내",
+          "summary": "테스트용 클럽에서 바로 볼 수 있는 기본 공지입니다.",
+          "body": "관리자 생성과 가입 승인 흐름을 점검할 때 쓰는 기본 공지입니다.",
+          "severity": "important",
+          "visibility": "member",
+          "pinned": true,
+          "featured": true,
+          "createdAt": "2026-03-31T21:30:00.000Z",
+          "updatedAt": "2026-03-31T21:30:00.000Z"
+        }
+      ],
+      "events": [
+        {
+          "id": "club-event-seed-hahahah-1",
+          "slug": "weekly-meetup",
+          "title": "주간 모임",
+          "summary": "5km 함께 달리기 흐름에 맞춘 기본 일정입니다.",
+          "startsAt": "2026-04-02T11:00:00.000Z",
+          "endsAt": "2026-04-02T13:00:00.000Z",
+          "location": "서울",
+          "attendanceTarget": 10,
+          "visibility": "member",
+          "featured": true,
+          "createdAt": "2026-03-31T21:30:00.000Z",
+          "updatedAt": "2026-03-31T21:30:00.000Z"
+        }
+      ],
+      "gallery": [
+        {
+          "id": "club-gallery-seed-hahahah-1",
+          "slug": "first-album",
+          "title": "첫 활동 앨범",
+          "caption": "테스트용 클럽에서도 바로 보이는 기본 앨범입니다.",
+          "photoCount": 8,
+          "noteCount": 2,
+          "visibility": "member",
+          "featured": true,
+          "createdAt": "2026-03-31T21:30:00.000Z",
+          "updatedAt": "2026-03-31T21:30:00.000Z"
+        }
+      ]
+    }
+  }
 }

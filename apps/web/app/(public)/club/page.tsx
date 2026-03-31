@@ -1,22 +1,16 @@
 import Link from "next/link";
 
 import { canAccessConsole } from "@ysplan/auth";
-import {
-  HeroCard,
-  MetricList,
-  PageShell,
-  SectionHeader,
-  StatusPill,
-  SurfaceCard,
-} from "@ysplan/ui";
+import { HeroCard, MetricList, PageShell, SectionHeader, StatusPill, SurfaceCard } from "@ysplan/ui";
 
+import { getDisplayClub } from "../../../src/lib/club-copy";
 import { listPublicClubPreviews } from "../../../src/lib/club-sites-store";
 import { getActivePlatformUserSession } from "../../../src/lib/server-sessions";
 import { getSharedThemePreset } from "../../../src/lib/shared-themes";
 
 export default async function ClubPage() {
   const platformSession = await getActivePlatformUserSession();
-  const clubs = await listPublicClubPreviews(platformSession);
+  const clubs = (await listPublicClubPreviews(platformSession)).map(getDisplayClub);
   const canManageConsole = platformSession ? canAccessConsole(platformSession) : false;
   const highlightedClub = clubs[0] ?? null;
   const clubTheme = highlightedClub ? getSharedThemePreset(highlightedClub.themePreset) : null;
@@ -24,9 +18,9 @@ export default async function ClubPage() {
   return (
     <PageShell
       mode="public"
-      eyebrow="Club"
-      title="클럽을 고르고, 들어간 뒤에는 활동 흐름에 집중합니다."
-      subtitle="공개 소개와 멤버 공간을 나눠 씁니다."
+      eyebrow="클럽"
+      title="클럽과 동호회 공간을 고르고 바로 들어가세요"
+      subtitle="설명보다 선택이 먼저 보이도록 정리했습니다. 공개 소개를 보고, 마음에 드는 곳에 바로 신청하면 됩니다."
       actions={
         <div className="inline-actions">
           <Link className="button button--ghost" href="/">
@@ -39,27 +33,27 @@ export default async function ClubPage() {
       }
     >
       <HeroCard
-        eyebrow="커뮤니티 중심 보드"
-        title="소개, 가입, 활동 기록을 한 흐름으로 이어 둡니다."
-        subtitle="정회원은 클럽을 3개까지 만들고, 비공개 클럽은 멤버와 관리자만 찾을 수 있습니다."
+        eyebrow="커뮤니티 보드"
+        title="공지, 일정, 사진 기록을 실제 사용하는 흐름으로 모읍니다"
+        subtitle="정회원은 클럽을 최대 3개까지 만들 수 있고, 가입 신청과 승인 흐름까지 한 번에 관리할 수 있습니다."
         meta={
           <>
-            <StatusPill tone="accent">클럽 3개</StatusPill>
-            <StatusPill tone="warm">가입 신청 / 초대제</StatusPill>
+            <StatusPill tone="accent">클럽 3개 생성</StatusPill>
+            <StatusPill tone="warm">가입 신청 후 승인</StatusPill>
             <StatusPill>{clubs.length}개 공개 클럽</StatusPill>
           </>
         }
         actions={
           <div className="inline-actions">
             <Link className="button button--primary" href="/clubs">
-              클럽 목록
+              클럽 목록 보기
             </Link>
             <Link className="button button--secondary" href="/sign-in?next=/console/clubs/new">
               클럽 만들기
             </Link>
             {canManageConsole ? (
               <Link className="button button--ghost" href="/console">
-                콘솔
+                관리 콘솔
               </Link>
             ) : null}
           </div>
@@ -68,16 +62,16 @@ export default async function ClubPage() {
         <MetricList
           items={[
             { label: "공개 클럽", value: `${clubs.length}개` },
-            { label: "클럽 생성 제한", value: "정회원 3개" },
-            { label: "가입 방식", value: "신청 / 승인 / 초대제" },
+            { label: "생성 가능", value: "정회원 3개" },
+            { label: "가입 흐름", value: "신청 → 승인" },
             { label: "공용 테마", value: "10종" },
           ]}
         />
       </HeroCard>
 
-      <section className="surface-stack">
-        <SectionHeader kicker="Featured" title="추천 클럽" />
-        {highlightedClub && clubTheme ? (
+      {highlightedClub && clubTheme ? (
+        <section className="surface-stack">
+          <SectionHeader kicker="추천 클럽" title="바로 보기" />
           <div
             style={{
               borderRadius: 28,
@@ -93,7 +87,7 @@ export default async function ClubPage() {
               footer={
                 <div className="inline-actions">
                   <Link className="button button--primary" href={`/clubs/${highlightedClub.slug}`}>
-                    상세 보기
+                    자세히 보기
                   </Link>
                   <Link className="button button--secondary" href={`/clubs/${highlightedClub.slug}/join`}>
                     가입 신청
@@ -102,7 +96,6 @@ export default async function ClubPage() {
               }
             >
               <p className="feature-copy">{highlightedClub.description}</p>
-              <p className="helper-text">{clubTheme.mood}</p>
               <div className="pill-row">
                 <StatusPill tone="warm">{highlightedClub.memberCount}명</StatusPill>
                 <StatusPill>{highlightedClub.nextEventLabel}</StatusPill>
@@ -110,57 +103,8 @@ export default async function ClubPage() {
               </div>
             </SurfaceCard>
           </div>
-        ) : null}
-      </section>
-
-      <section className="surface-stack">
-        <SectionHeader kicker="Preview" title="지금 열려 있는 공개 클럽" />
-        <div style={{ display: "grid", gap: 16 }}>
-          {clubs.slice(0, 3).map((club) => {
-            const theme = getSharedThemePreset(club.themePreset);
-
-            return (
-              <div
-                key={club.slug}
-                style={{
-                  borderRadius: 28,
-                  padding: 1,
-                  background: `linear-gradient(135deg, ${theme.familyTheme.accentColor}20, ${theme.familyTheme.surfaceColor})`,
-                }}
-              >
-                <SurfaceCard
-                  eyebrow={`${club.category} · ${theme.label}`}
-                  title={club.name}
-                  description={club.tagline}
-                  badge={<StatusPill tone="warm">{club.accessLabel}</StatusPill>}
-                  footer={
-                    <div className="inline-actions">
-                      <Link className="button button--primary" href={`/clubs/${club.slug}`}>
-                        상세 보기
-                      </Link>
-                      <Link className="button button--secondary" href={`/clubs/${club.slug}/join`}>
-                        가입 신청
-                      </Link>
-                    </div>
-                  }
-                >
-                  <p className="feature-copy">{club.description}</p>
-                  <p className="helper-text">{theme.mood}</p>
-                  <div className="pill-row">
-                    <StatusPill tone="accent">{club.memberCount}명</StatusPill>
-                    <StatusPill>{club.nextEventLabel}</StatusPill>
-                    {club.sampleModules.slice(0, 4).map((module) => (
-                      <span className="module-pill" key={module}>
-                        {module}
-                      </span>
-                    ))}
-                  </div>
-                </SurfaceCard>
-              </div>
-            );
-          })}
-        </div>
-      </section>
+        </section>
+      ) : null}
     </PageShell>
   );
 }

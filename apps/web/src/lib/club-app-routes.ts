@@ -48,20 +48,22 @@ export function buildClubMobilePreviewHref(clubSlug: string, screen?: string): s
     : `/preview/mobile/club/${clubSlug}`;
 }
 
-export function getClubModuleRouteSpec(moduleKey: string): { label: string; summary: string } | null {
+export function getClubModuleRouteSpec(
+  moduleKey: string,
+): { label: string; summary: string } | null {
   switch (moduleKey) {
     case "announcements":
-      return { label: "공지", summary: "운영 공지와 준비 사항을 빠르게 공유하는 보드" };
+      return { label: "공지", summary: "운영 공지와 변경 안내를 모아보는 게시판" };
     case "events":
-      return { label: "이벤트", summary: "다가오는 일정과 모임 흐름을 한눈에 보는 보드" };
+      return { label: "일정", summary: "모임 일정과 준비 정보를 보는 게시판" };
     case "gallery":
-      return { label: "갤러리", summary: "활동 사진과 결과 기록을 모아보는 공간" };
+      return { label: "갤러리", summary: "활동 사진과 기록을 모아보는 게시판" };
     case "leaderboard":
-      return { label: "리더보드", summary: "이번 시즌 기록과 참여 순위를 확인하는 공간" };
+      return { label: "리더보드", summary: "참여 기록과 순위를 보는 공간" };
     case "faq":
-      return { label: "FAQ", summary: "가입 전에 자주 묻는 질문과 운영 답변" };
+      return { label: "FAQ", summary: "자주 묻는 질문을 빠르게 찾는 공간" };
     case "resources":
-      return { label: "자료실", summary: "체크리스트, 준비물, 운영 문서를 모아두는 공간" };
+      return { label: "자료실", summary: "운영 문서와 체크리스트를 모아두는 공간" };
     default:
       return null;
   }

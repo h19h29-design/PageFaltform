@@ -1,27 +1,22 @@
 import Link from "next/link";
 
-import {
-  HeroCard,
-  PageShell,
-  SectionHeader,
-  StatusPill,
-  SurfaceCard,
-} from "@ysplan/ui";
+import { HeroCard, PageShell, SectionHeader, StatusPill, SurfaceCard } from "@ysplan/ui";
 
+import { getDisplayClub } from "../../../src/lib/club-copy";
 import { listPublicClubPreviews } from "../../../src/lib/club-sites-store";
 import { getActivePlatformUserSession } from "../../../src/lib/server-sessions";
 import { getSharedThemePreset } from "../../../src/lib/shared-themes";
 
 export default async function ClubsDirectoryPage() {
   const platformSession = await getActivePlatformUserSession();
-  const clubs = await listPublicClubPreviews(platformSession);
+  const clubs = (await listPublicClubPreviews(platformSession)).map(getDisplayClub);
 
   return (
     <PageShell
       mode="public"
       eyebrow="클럽 목록"
-      title="공개 클럽을 성격별로 바로 둘러보세요."
-      subtitle="상세에 들어가면 바로 참여 흐름으로 이어집니다."
+      title="공개 클럽을 골라 바로 둘러보세요"
+      subtitle="상세 페이지에서 분위기와 가입 방식을 확인하고, 마음에 드는 곳에 바로 신청할 수 있습니다."
       actions={
         <div className="inline-actions">
           <Link className="button button--ghost" href="/club">
@@ -34,24 +29,20 @@ export default async function ClubsDirectoryPage() {
       }
     >
       <HeroCard
-        eyebrow="공개 탐색"
-        title="목록에서는 클럽의 분위기와 운영 방식이 먼저 보이고, 상세에서 바로 참여 흐름으로 이어집니다."
-        subtitle="가입 신청형, 승인형, 초대제 여부를 카드에서 먼저 드러내고, 상세 페이지에서 운영 포인트와 공개 범위를 더 자세히 안내합니다."
+        eyebrow="디렉터리"
+        title="분위기, 가입 방식, 다음 일정만 보고 빠르게 고르세요"
+        subtitle="비공개 클럽은 승인된 멤버만 찾을 수 있고, 공개 클럽은 상세 페이지에서 바로 신청 흐름으로 이어집니다."
         meta={
           <>
             <StatusPill tone="accent">{clubs.length}개 공개 클럽</StatusPill>
-            <StatusPill tone="warm">가입 신청 / 초대제</StatusPill>
+            <StatusPill tone="warm">가입 신청 / 승인 / 초대</StatusPill>
             <StatusPill>테마 10종</StatusPill>
           </>
         }
       />
 
       <section className="surface-stack">
-        <SectionHeader
-          kicker="Directory"
-          title="클럽 디렉토리"
-          action={<StatusPill>{clubs.length}개</StatusPill>}
-        />
+        <SectionHeader kicker="Directory" title="클럽 디렉터리" action={<StatusPill>{clubs.length}개</StatusPill>} />
         <div className="directory-grid">
           {clubs.map((club) => {
             const theme = getSharedThemePreset(club.themePreset);
@@ -78,7 +69,7 @@ export default async function ClubsDirectoryPage() {
                   footer={
                     <div className="inline-actions">
                       <Link className="button button--primary" href={`/clubs/${club.slug}`}>
-                        상세 보기
+                        자세히 보기
                       </Link>
                       <Link className="button button--secondary" href={`/clubs/${club.slug}/join`}>
                         가입 신청
@@ -92,10 +83,7 @@ export default async function ClubsDirectoryPage() {
                     <StatusPill tone="warm">{club.ownerName}</StatusPill>
                   </div>
 
-                  <div className="directory-card__summary">
-                    <p className="feature-copy">{club.description}</p>
-                    <p className="helper-text">{theme.mood}</p>
-                  </div>
+                  <p className="feature-copy">{club.description}</p>
 
                   <div className="directory-card__highlights">
                     {club.highlights.slice(0, 3).map((highlight) => (
