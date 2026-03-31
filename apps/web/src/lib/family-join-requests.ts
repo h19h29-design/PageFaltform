@@ -3,6 +3,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { getPrismaClient } from "@ysplan/database";
 import type { PlatformAccountRole, PlatformMembership } from "@ysplan/auth";
 
 import { grantLocalPlatformMembership } from "./local-platform-auth";
@@ -103,6 +104,85 @@ function sanitizeRequest(value: unknown): StoredFamilyJoinRequest | null {
 
 function cloneRequest(request: StoredFamilyJoinRequest): StoredFamilyJoinRequest {
   return { ...request };
+}
+
+function isDatabaseSourceOfTruthEnabled(): boolean {
+  return Boolean(process.env.DATABASE_URL) && process.env.YSPLAN_ENABLE_DB_BASELINE === "1";
+}
+
+function toDbMembershipRole(
+  role: Extract<PlatformMembership["role"], "owner" | "admin" | "member" | "child">,
+): "OWNER" | "ADMIN" | "MEMBER" | "CHILD" {
+  switch (role) {
+    case "owner":
+      return "OWNER";
+    case "admin":
+      return "ADMIN";
+    case "child":
+      return "CHILD";
+    default:
+      return "MEMBER";
+  }
+}
+
+async function grantApprovedMembership(input: {
+  userId: string;
+  familySlug: string;
+  familyName: string;
+  displayName: string;
+  role: Extract<PlatformMembership["role"], "owner" | "admin" | "member" | "child">;
+}): Promise<void> {
+  if (isDatabaseSourceOfTruthEnabled()) {
+    const prisma = getPrismaClient();
+    const normalizedSlug = input.familySlug.trim().toLowerCase();
+    const family = await prisma.familyTenant.findUnique({
+      where: { slug: normalizedSlug },
+      select: { id: true },
+    });
+
+    if (!family) {
+      throw new Error("family-not-found");
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: input.userId },
+      select: { id: true },
+    });
+
+    if (!user) {
+      throw new Error("user-not-found");
+    }
+
+    await prisma.membership.upsert({
+      where: {
+        userId_tenantId: {
+          userId: user.id,
+          tenantId: family.id,
+        },
+      },
+      update: {
+        role: toDbMembershipRole(input.role),
+        displayName: input.displayName.trim(),
+      },
+      create: {
+        userId: user.id,
+        tenantId: family.id,
+        role: toDbMembershipRole(input.role),
+        displayName: input.displayName.trim(),
+      },
+    });
+
+    return;
+  }
+
+  await grantLocalPlatformMembership({
+    userId: input.userId,
+    membership: {
+      familySlug: input.familySlug,
+      familyName: input.familyName,
+      role: input.role,
+    } satisfies PlatformMembership,
+  });
 }
 
 async function ensureStore(): Promise<void> {
@@ -248,13 +328,12 @@ export async function approveFamilyJoinRequest(input: {
   request.decidedAt = new Date().toISOString();
   request.decidedByUserId = input.decidedByUserId;
 
-  await grantLocalPlatformMembership({
+  await grantApprovedMembership({
     userId: request.requesterUserId,
-    membership: {
-      familySlug: request.familySlug,
-      familyName: request.familyName,
-      role: "member",
-    } satisfies PlatformMembership,
+    familySlug: request.familySlug,
+    familyName: request.familyName,
+    displayName: request.requesterDisplayName,
+    role: "member",
   });
 
   await writeStore(store);

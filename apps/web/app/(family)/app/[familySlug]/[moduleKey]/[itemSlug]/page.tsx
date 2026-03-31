@@ -24,8 +24,8 @@ export default async function FamilyModuleDetailPage({ params }: FamilyModuleDet
   return (
     <FamilyAppShell
       canManage={familyAppView.canManage}
-      subtitle={spec.summary}
-      title={`${spec.label} detail`}
+      subtitle=""
+      title={`${spec.label} 상세`}
       viewerRole={familyAppView.viewerRole}
       workspaceView={familyAppView.workspaceView}
     >

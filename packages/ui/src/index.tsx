@@ -11,11 +11,14 @@ export function PageShell(props: {
   title: string;
   subtitle?: string;
   actions?: ReactNode;
+  mode?: "default" | "public" | "member" | "console";
   children: ReactNode;
 }) {
+  const mode = props.mode ?? "default";
+
   return (
-    <main className="page-shell">
-      <header className="page-shell__header">
+    <main className={joinClassNames("page-shell", mode !== "default" && `page-shell--${mode}`)}>
+      <header className={joinClassNames("page-shell__header", mode !== "default" && `page-shell__header--${mode}`)}>
         {props.eyebrow ? <p className="eyebrow">{props.eyebrow}</p> : null}
         <div className="page-shell__title-row">
           <div>

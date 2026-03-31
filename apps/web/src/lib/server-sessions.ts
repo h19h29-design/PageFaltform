@@ -58,11 +58,11 @@ export const authDataCutoverPaths: AuthDataCutoverPath[] = [
 ];
 
 export function isDatabaseSourceOfTruthEnabled(): boolean {
-  return Boolean(process.env.DATABASE_URL);
+  return Boolean(process.env.DATABASE_URL) && process.env.YSPLAN_ENABLE_DB_BASELINE === "1";
 }
 
 export function isDbAuthBaselineEnabled(): boolean {
-  return Boolean(process.env.DATABASE_URL) && process.env.YSPLAN_ENABLE_DB_BASELINE === "1";
+  return isDatabaseSourceOfTruthEnabled();
 }
 
 export async function getActiveFamilyAccessSession(): Promise<FamilyAccessSession | null> {

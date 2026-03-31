@@ -49,20 +49,27 @@ export function ModuleRuleListCard(props: {
   extra?: ReactNode;
 }) {
   return (
-    <SurfaceCard title={props.title} description={props.description}>
-      <ol className="journey-list">
-        {props.rules.map((rule, index) => (
-          <li className="journey-list__item" key={rule.id}>
-            <span className="journey-list__number">{index + 1}</span>
-            <div>
-              <strong>{rule.title}</strong>
-              <p className="feature-copy">{rule.description}</p>
-            </div>
-          </li>
-        ))}
-      </ol>
-      {props.extra}
-    </SurfaceCard>
+    <details className="module-help-card">
+      <summary>
+        <span>{props.title}</span>
+        <span className="module-help-card__hint">설명 보기</span>
+      </summary>
+      <div className="module-help-card__body">
+        <p className="helper-text">{props.description}</p>
+        <ol className="journey-list">
+          {props.rules.map((rule, index) => (
+            <li className="journey-list__item" key={rule.id}>
+              <span className="journey-list__number">{index + 1}</span>
+              <div>
+                <strong>{rule.title}</strong>
+                <p className="feature-copy">{rule.description}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+        {props.extra}
+      </div>
+    </details>
   );
 }
 

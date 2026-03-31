@@ -1,11 +1,7 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import {
-  schoolTimetableHomeCardRules,
-  type SchoolTimetableDashboardSelection,
-  type SchoolTimetableFixture,
-} from "@ysplan/modules-school-timetable";
+import { type SchoolTimetableDashboardSelection, type SchoolTimetableFixture } from "@ysplan/modules-school-timetable";
 import { PageShell, SectionHeader, StatusPill, SurfaceCard } from "@ysplan/ui";
 
 import {
@@ -24,7 +20,6 @@ import {
   ModuleEmptyState,
   ModuleHeaderActions,
   ModuleNoticeCard,
-  ModuleRuleListCard,
 } from "src/lib/schedule-module-page-parts";
 import {
   formatAudienceLabel,
@@ -171,7 +166,6 @@ export default async function SchoolTimetableRoutePage(props: SchoolTimetableRou
       <PageShell
         eyebrow={`${workspaceView.family.name} 시간표`}
         title="학교 시간표"
-        subtitle="요일·교시처럼 읽히는 표와 준비물 메모를 함께 보여줘서, 학교 일정이 한눈에 들어오게 구성했습니다."
         actions={
           <ModuleHeaderActions
             familySlug={workspaceView.family.slug}
@@ -183,58 +177,49 @@ export default async function SchoolTimetableRoutePage(props: SchoolTimetableRou
       >
         <ModuleNoticeCard error={searchParams.error} state={searchParams.state} />
 
-        <div className="grid-two">
-          <SurfaceCard
-            title="주간 표 보기"
-            description="요일별로 수업과 준비물 메모를 빠르게 확인할 수 있습니다."
-            badge={<StatusPill tone="accent">{schedules.length}건</StatusPill>}
-          >
-            {schedules.length === 0 ? (
-              <p className="feature-copy">등록된 시간표가 아직 없습니다.</p>
-            ) : (
-              <div className="timetable-sheet">
-                <div className="timetable-sheet__head timetable-sheet__cell">교시</div>
-                {weekdayOrder.map((weekday) => (
-                  <div className="timetable-sheet__head timetable-sheet__cell" key={weekday.key}>
-                    {weekday.label}
-                  </div>
-                ))}
+        <SurfaceCard
+          title="주간 표 보기"
+          badge={<StatusPill tone="accent">{schedules.length}건</StatusPill>}
+        >
+          {schedules.length === 0 ? (
+            <p className="feature-copy">등록된 시간표가 아직 없습니다.</p>
+          ) : (
+            <div className="timetable-sheet">
+              <div className="timetable-sheet__head timetable-sheet__cell">교시</div>
+              {weekdayOrder.map((weekday) => (
+                <div className="timetable-sheet__head timetable-sheet__cell" key={weekday.key}>
+                  {weekday.label}
+                </div>
+              ))}
 
-                {periodLabels.map((periodLabel) => (
-                  <div className="timetable-sheet__row" key={periodLabel}>
-                    <div className="timetable-sheet__cell timetable-sheet__cell--time">{periodLabel}</div>
-                    {weekdayOrder.map((weekday) => {
-                      const schedule = matrix.get(`${weekday.key}-${periodLabel}`);
+              {periodLabels.map((periodLabel) => (
+                <div className="timetable-sheet__row" key={periodLabel}>
+                  <div className="timetable-sheet__cell timetable-sheet__cell--time">{periodLabel}</div>
+                  {weekdayOrder.map((weekday) => {
+                    const schedule = matrix.get(`${weekday.key}-${periodLabel}`);
 
-                      return (
-                        <div className="timetable-sheet__cell" key={`${weekday.key}-${periodLabel}`}>
-                          {schedule ? (
-                            <Link
-                              className="timetable-sheet__entry"
-                              href={`/app/${workspaceView.family.slug}/school-timetable/${schedule.slug}`}
-                            >
-                              <strong>{schedule.title}</strong>
-                              <span>{schedule.studentLabel}</span>
-                              {schedule.preparationNote ? <small>{schedule.preparationNote}</small> : null}
-                            </Link>
-                          ) : (
-                            <span className="timetable-sheet__empty">-</span>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                ))}
-              </div>
-            )}
-          </SurfaceCard>
-
-          <ModuleRuleListCard
-            description="등하교 동선이나 준비물 체크가 필요한 항목은 오늘 카드와 보조 카드에 우선 반영됩니다."
-            rules={schoolTimetableHomeCardRules}
-            title="홈 반영 규칙"
-          />
-        </div>
+                    return (
+                      <div className="timetable-sheet__cell" key={`${weekday.key}-${periodLabel}`}>
+                        {schedule ? (
+                          <Link
+                            className="timetable-sheet__entry"
+                            href={`/app/${workspaceView.family.slug}/school-timetable/${schedule.slug}`}
+                          >
+                            <strong>{schedule.title}</strong>
+                            <span>{schedule.studentLabel}</span>
+                            {schedule.preparationNote ? <small>{schedule.preparationNote}</small> : null}
+                          </Link>
+                        ) : (
+                          <span className="timetable-sheet__empty">-</span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+          )}
+        </SurfaceCard>
 
         <SectionHeader
           kicker="오늘 준비"
@@ -269,7 +254,6 @@ export default async function SchoolTimetableRoutePage(props: SchoolTimetableRou
       <PageShell
         eyebrow={`${workspaceView.family.name} 시간표`}
         title="오늘 준비 시간표"
-        subtitle="가족 홈의 오늘 카드와 같은 기준으로 잡힌 등하교·수업 동선입니다."
         actions={
           <ModuleHeaderActions
             familySlug={workspaceView.family.slug}
@@ -303,7 +287,6 @@ export default async function SchoolTimetableRoutePage(props: SchoolTimetableRou
       <PageShell
         eyebrow={`${workspaceView.family.name} 시간표`}
         title="시간표 추가"
-        subtitle="간단히 입력해도 표 보기와 준비물 메모가 함께 반영됩니다."
         actions={
           <ModuleHeaderActions
             familySlug={workspaceView.family.slug}
@@ -314,27 +297,14 @@ export default async function SchoolTimetableRoutePage(props: SchoolTimetableRou
         }
       >
         <ModuleNoticeCard error={searchParams.error} state={searchParams.state} />
-        <div className="grid-two">
-          <SurfaceCard title="시간표 입력">
-            <SchoolTimetableForm
-              action={createSchoolTimetableAction}
-              familySlug={workspaceView.family.slug}
-              submitLabel="시간표 저장"
-              timezone={timezone}
-            />
-          </SurfaceCard>
-          <SurfaceCard
-            title="빠른 입력 팁"
-            description="엑셀처럼 하나씩 채우는 느낌으로, 학생 이름과 수업 이름부터 짧게 입력해도 됩니다."
-            tone="accent"
-          >
-            <ul className="stack-list compact-list">
-              <li>요일은 시작 시간으로 구분됩니다.</li>
-              <li>같은 시간대 수업은 표에서 같은 줄에 정렬됩니다.</li>
-              <li>준비물 메모는 표 셀과 상세 화면에 함께 보입니다.</li>
-            </ul>
-          </SurfaceCard>
-        </div>
+        <SurfaceCard title="시간표 입력">
+          <SchoolTimetableForm
+            action={createSchoolTimetableAction}
+            familySlug={workspaceView.family.slug}
+            submitLabel="시간표 저장"
+            timezone={timezone}
+          />
+        </SurfaceCard>
       </PageShell>
     );
   }
@@ -354,7 +324,6 @@ export default async function SchoolTimetableRoutePage(props: SchoolTimetableRou
       <PageShell
         eyebrow={`${workspaceView.family.name} 시간표`}
         title={`${schedule.studentLabel} · ${schedule.title}`}
-        subtitle="상세에서 준비물과 홈 반영 상태를 함께 확인할 수 있습니다."
         actions={
           <div className="inline-actions">
             <Link className="button button--ghost" href={`/app/${workspaceView.family.slug}/school-timetable`}>
@@ -440,7 +409,6 @@ export default async function SchoolTimetableRoutePage(props: SchoolTimetableRou
       <PageShell
         eyebrow={`${workspaceView.family.name} 시간표`}
         title="시간표 수정"
-        subtitle="수정 후 바로 표 보기와 상세, 홈 반영 상태를 다시 확인할 수 있습니다."
         actions={
           <div className="inline-actions">
             <Link
@@ -459,26 +427,19 @@ export default async function SchoolTimetableRoutePage(props: SchoolTimetableRou
         }
       >
         <ModuleNoticeCard error={searchParams.error} state={searchParams.state} />
-        <div className="grid-two">
-          <SurfaceCard title="시간표 수정">
-            <SchoolTimetableForm
-              action={updateSchoolTimetableAction}
-              familySlug={workspaceView.family.slug}
-              schedule={schedule}
-              submitLabel="시간표 수정 저장"
-              timezone={timezone}
-            />
-          </SurfaceCard>
-          <SurfaceCard
-            title="현재 표시"
-            description="저장 전에 현재 표 셀과 카드 구성을 미리 확인합니다."
-          >
-            {renderSchoolCard(workspaceView.family.slug, timezone, schedule, selection)}
-          </SurfaceCard>
-        </div>
+        <SurfaceCard title="시간표 수정">
+          <SchoolTimetableForm
+            action={updateSchoolTimetableAction}
+            familySlug={workspaceView.family.slug}
+            schedule={schedule}
+            submitLabel="시간표 수정 저장"
+            timezone={timezone}
+          />
+        </SurfaceCard>
       </PageShell>
     );
   }
 
   notFound();
 }
+

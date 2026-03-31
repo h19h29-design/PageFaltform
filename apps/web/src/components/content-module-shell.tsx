@@ -19,6 +19,7 @@ export function ContentModuleShell(props: {
       style={createFamilySceneStyle(props.workspaceView.family.theme)}
     >
       <PageShell
+        mode="member"
         eyebrow={props.eyebrow}
         title={props.title}
         subtitle={props.subtitle}

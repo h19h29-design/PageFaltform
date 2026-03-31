@@ -24,8 +24,8 @@ export default async function FamilyModuleNewPage({ params }: FamilyModuleNewPag
   return (
     <FamilyAppShell
       canManage={familyAppView.canManage}
-      subtitle={spec.summary}
-      title={`${spec.label} create`}
+      subtitle=""
+      title={`${spec.label} 새로 만들기`}
       viewerRole={familyAppView.viewerRole}
       workspaceView={familyAppView.workspaceView}
     >

@@ -1,4 +1,4 @@
-import { randomUUID } from "node:crypto";
+﻿import { randomUUID } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -20,6 +20,7 @@ import {
 import {
   normalizeModuleKeys,
   resolveFamilyWorkspace,
+  familyThemePresetKeys,
   type FamilyEntryPreset,
   type FamilyHomePreset,
   type FamilyThemePreset,
@@ -36,6 +37,8 @@ import {
   type FamilyTheme,
   type FamilyVisibility,
 } from "@ysplan/tenant";
+import { familyThemePresetOptions } from "./shared-themes";
+export { familyThemePresetOptions } from "./shared-themes";
 
 type ConsoleFamilyRole = ConsoleManagerRole;
 
@@ -88,47 +91,6 @@ interface LegacyFamilySiteStore {
 }
 
 export type FamilyThemePresetKey = FamilyThemePreset;
-
-export const familyThemePresetOptions: Array<{
-  key: FamilyThemePresetKey;
-  label: string;
-  description: string;
-  theme: FamilyTheme;
-}> = [
-  {
-    key: "garden",
-    label: "가든 톤",
-    description: "차분한 그린과 온화한 오렌지 조합입니다.",
-    theme: {
-      accentColor: "#2f5e4e",
-      warmColor: "#c26d4e",
-      surfaceColor: "#fff9f1",
-      highlightColor: "#ead7bd",
-    },
-  },
-  {
-    key: "sunset",
-    label: "선셋 톤",
-    description: "살짝 따뜻한 보드 계열로 홈을 밝게 보여 줍니다.",
-    theme: {
-      accentColor: "#8b4f39",
-      warmColor: "#d47a51",
-      surfaceColor: "#fff6ef",
-      highlightColor: "#f1d3bc",
-    },
-  },
-  {
-    key: "sky",
-    label: "스카이 톤",
-    description: "청량한 블루 계열로 깔끔한 가족 보드를 만듭니다.",
-    theme: {
-      accentColor: "#2c5d79",
-      warmColor: "#c86d47",
-      surfaceColor: "#f5fbff",
-      highlightColor: "#cfe4f1",
-    },
-  },
-];
 
 const DEFAULT_DB_MODULES = ["announcements", "calendar", "todo"] as const;
 
@@ -225,11 +187,9 @@ function sanitizeWorkspaceDraft(
       value.homePreset === "planner" || value.homePreset === "story" ? value.homePreset : "balanced",
     entryPreset: value.entryPreset === "direct" ? "direct" : "guided",
     themePreset:
-      value.themePreset === "sunset" || value.themePreset === "sky"
-        ? value.themePreset
-        : value.themePreset === "garden"
-          ? "garden"
-          : "garden",
+      familyThemePresetKeys.includes(value.themePreset as FamilyThemePreset)
+        ? (value.themePreset as FamilyThemePreset)
+        : "ocean-depths",
     updatedAt: typeof value.updatedAt === "string" ? value.updatedAt : new Date(0).toISOString(),
   };
 }
@@ -446,12 +406,12 @@ export function resolveFamilyThemePresetKey(theme: FamilyTheme): FamilyThemePres
         presetTheme.surfaceColor.toLowerCase() === normalizedSurface &&
         presetTheme.highlightColor.toLowerCase() === normalizedHighlight
       );
-    })?.key ?? "garden"
+    })?.key ?? "ocean-depths"
   );
 }
 
 function hasDatabaseSourceOfTruth(): boolean {
-  return Boolean(process.env.DATABASE_URL);
+  return Boolean(process.env.DATABASE_URL) && process.env.YSPLAN_ENABLE_DB_BASELINE === "1";
 }
 
 function findDemoFamilyRecord(familySlug: string): FamilyTenantRecord | null {
@@ -608,7 +568,7 @@ export async function countOwnedCustomFamilySites(userId: string): Promise<numbe
 export function getCustomFamilyCreationLimit(
   accountRole: PlatformAccountRole,
 ): number {
-  return accountRole === "master" ? 99 : 5;
+  return accountRole === "master" ? 99 : 1;
 }
 
 export async function resolveRuntimeFamilyFromSlug(familySlug: string): Promise<RuntimeFamilyRecord | null> {
@@ -842,7 +802,7 @@ export async function createCustomFamilySite(input: {
     const ownedFamilyCount = await countOwnedCustomFamilySites(input.ownerUserId);
 
     if (ownedFamilyCount >= getCustomFamilyCreationLimit(input.creatorPlatformRole)) {
-      throw new Error("정회원은 가족홈을 최대 5개까지 만들 수 있습니다.");
+      throw new Error("정회원은 가족홈을 최대 1개까지 만들 수 있습니다.");
     }
   }
 

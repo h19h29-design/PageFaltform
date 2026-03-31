@@ -1,7 +1,7 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { todoHomeCardRules, type TodoDashboardSelection, type TodoItemFixture } from "@ysplan/modules-todo";
+import { type TodoDashboardSelection, type TodoItemFixture } from "@ysplan/modules-todo";
 import { PageShell, StatusPill, SurfaceCard } from "@ysplan/ui";
 
 import {
@@ -20,7 +20,6 @@ import {
   ModuleEmptyState,
   ModuleHeaderActions,
   ModuleNoticeCard,
-  ModuleRuleListCard,
 } from "src/lib/schedule-module-page-parts";
 import {
   formatAudienceLabel,
@@ -129,7 +128,6 @@ export default async function TodoRoutePage(props: TodoRoutePageProps) {
       <PageShell
         eyebrow={`${workspaceView.family.name} 체크리스트`}
         title="가족 체크리스트"
-        subtitle="중요한 일은 위로, 완료한 일은 아래로 정리해 실제 체크리스트처럼 빠르게 훑어볼 수 있게 구성했습니다."
         actions={
           <ModuleHeaderActions
             familySlug={workspaceView.family.slug}
@@ -141,38 +139,29 @@ export default async function TodoRoutePage(props: TodoRoutePageProps) {
       >
         <ModuleNoticeCard error={searchParams.error} state={searchParams.state} />
 
-        <div className="grid-two">
-          <SurfaceCard
-            title="오늘 체크 상태"
-            description="지연 항목, 오늘 마감, 완료 수를 한 번에 파악합니다."
-            badge={<StatusPill tone="accent">{timezone}</StatusPill>}
-          >
-            <dl className="fact-grid">
-              <div className="fact-grid__item">
-                <dt>전체 항목</dt>
-                <dd>{items.length}건</dd>
-              </div>
-              <div className="fact-grid__item">
-                <dt>지연</dt>
-                <dd>{grouped.overdue.length}건</dd>
-              </div>
-              <div className="fact-grid__item">
-                <dt>오늘</dt>
-                <dd>{grouped.today.length}건</dd>
-              </div>
-              <div className="fact-grid__item">
-                <dt>완료</dt>
-                <dd>{grouped.done.length}건</dd>
-              </div>
-            </dl>
-          </SurfaceCard>
-
-          <ModuleRuleListCard
-            description="가족 공용 지연 항목이 우선이고, 개인 중요 항목은 보조 카드로 반영됩니다."
-            rules={todoHomeCardRules}
-            title="홈 반영 규칙"
-          />
-        </div>
+        <SurfaceCard
+          title="오늘 체크 상태"
+          badge={<StatusPill tone="accent">{timezone}</StatusPill>}
+        >
+          <dl className="fact-grid">
+            <div className="fact-grid__item">
+              <dt>전체 항목</dt>
+              <dd>{items.length}건</dd>
+            </div>
+            <div className="fact-grid__item">
+              <dt>지연</dt>
+              <dd>{grouped.overdue.length}건</dd>
+            </div>
+            <div className="fact-grid__item">
+              <dt>오늘</dt>
+              <dd>{grouped.today.length}건</dd>
+            </div>
+            <div className="fact-grid__item">
+              <dt>완료</dt>
+              <dd>{grouped.done.length}건</dd>
+            </div>
+          </dl>
+        </SurfaceCard>
 
         {items.length === 0 ? (
           <ModuleEmptyState
@@ -222,7 +211,6 @@ export default async function TodoRoutePage(props: TodoRoutePageProps) {
       <PageShell
         eyebrow={`${workspaceView.family.name} 체크리스트`}
         title="지연된 항목"
-        subtitle="가족 홈의 지연 카드와 같은 기준으로 묶인 목록입니다."
         actions={
           <ModuleHeaderActions
             familySlug={workspaceView.family.slug}
@@ -256,7 +244,6 @@ export default async function TodoRoutePage(props: TodoRoutePageProps) {
       <PageShell
         eyebrow={`${workspaceView.family.name} 체크리스트`}
         title="오늘 마감 항목"
-        subtitle="지연은 아니지만 오늘 안에 끝내면 좋은 항목만 모아둔 보기입니다."
         actions={
           <ModuleHeaderActions
             familySlug={workspaceView.family.slug}
@@ -290,7 +277,6 @@ export default async function TodoRoutePage(props: TodoRoutePageProps) {
       <PageShell
         eyebrow={`${workspaceView.family.name} 체크리스트`}
         title="할 일 추가"
-        subtitle="짧은 제목과 마감 시간만 입력해도 체크리스트에 바로 반영됩니다."
         actions={
           <ModuleHeaderActions
             familySlug={workspaceView.family.slug}
@@ -301,21 +287,14 @@ export default async function TodoRoutePage(props: TodoRoutePageProps) {
         }
       >
         <ModuleNoticeCard error={searchParams.error} state={searchParams.state} />
-        <div className="grid-two">
-          <SurfaceCard title="할 일 입력">
-            <TodoItemForm
-              action={createTodoItemAction}
-              familySlug={workspaceView.family.slug}
-              submitLabel="할 일 저장"
-              timezone={timezone}
-            />
-          </SurfaceCard>
-          <ModuleRuleListCard
-            description="가족 공용 여부와 중요 체크 여부에 따라 홈 반영 우선순위가 달라집니다."
-            rules={todoHomeCardRules}
-            title="입력 전에 볼 규칙"
+        <SurfaceCard title="할 일 입력">
+          <TodoItemForm
+            action={createTodoItemAction}
+            familySlug={workspaceView.family.slug}
+            submitLabel="할 일 저장"
+            timezone={timezone}
           />
-        </div>
+        </SurfaceCard>
       </PageShell>
     );
   }
@@ -336,7 +315,6 @@ export default async function TodoRoutePage(props: TodoRoutePageProps) {
       <PageShell
         eyebrow={`${workspaceView.family.name} 체크리스트`}
         title={item.title}
-        subtitle="상세에서 완료 여부와 홈 반영 상태를 함께 확인할 수 있습니다."
         actions={
           <div className="inline-actions">
             <Link className="button button--ghost" href={`/app/${workspaceView.family.slug}/todo`}>
@@ -420,7 +398,6 @@ export default async function TodoRoutePage(props: TodoRoutePageProps) {
       <PageShell
         eyebrow={`${workspaceView.family.name} 체크리스트`}
         title="할 일 수정"
-        subtitle="수정 후 바로 상세 페이지와 홈 반영 상태를 다시 볼 수 있습니다."
         actions={
           <div className="inline-actions">
             <Link className="button button--ghost" href={`/app/${workspaceView.family.slug}/todo/${item.slug}`}>
@@ -436,26 +413,19 @@ export default async function TodoRoutePage(props: TodoRoutePageProps) {
         }
       >
         <ModuleNoticeCard error={searchParams.error} state={searchParams.state} />
-        <div className="grid-two">
-          <SurfaceCard title="할 일 수정">
-            <TodoItemForm
-              action={updateTodoItemAction}
-              familySlug={workspaceView.family.slug}
-              submitLabel="할 일 수정 저장"
-              timezone={timezone}
-              todo={item}
-            />
-          </SurfaceCard>
-          <SurfaceCard
-            title="현재 표시"
-            description="저장 전에 현재 체크리스트 카드 구성을 미리 확인합니다."
-          >
-            {renderTodoRow(workspaceView.family.slug, timezone, item, selection)}
-          </SurfaceCard>
-        </div>
+        <SurfaceCard title="할 일 수정">
+          <TodoItemForm
+            action={updateTodoItemAction}
+            familySlug={workspaceView.family.slug}
+            submitLabel="할 일 수정 저장"
+            timezone={timezone}
+            todo={item}
+          />
+        </SurfaceCard>
       </PageShell>
     );
   }
 
   notFound();
 }
+

@@ -24,8 +24,8 @@ export default async function FamilyModuleListPage({ params }: FamilyModuleListP
   return (
     <FamilyAppShell
       canManage={familyAppView.canManage}
-      subtitle={spec.summary}
-      title={`${spec.label} module`}
+      subtitle=""
+      title={`${spec.label} 목록`}
       viewerRole={familyAppView.viewerRole}
       workspaceView={familyAppView.workspaceView}
     >

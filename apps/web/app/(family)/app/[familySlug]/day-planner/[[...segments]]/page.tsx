@@ -1,8 +1,7 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import {
-  dayPlannerHomeCardRules,
   type DayPlannerBlockFixture,
   type DayPlannerDashboardSelection,
 } from "@ysplan/modules-day-planner";
@@ -24,7 +23,6 @@ import {
   ModuleEmptyState,
   ModuleHeaderActions,
   ModuleNoticeCard,
-  ModuleRuleListCard,
 } from "src/lib/schedule-module-page-parts";
 import {
   formatAudienceLabel,
@@ -108,7 +106,6 @@ export default async function DayPlannerRoutePage(props: DayPlannerRoutePageProp
       <PageShell
         eyebrow={`${workspaceView.family.name} Day Planner`}
         title="데이 플래너 목록"
-        subtitle="공동 시간 블록은 today 카드로, handoff가 필요한 개인 블록은 focus 카드로 이어집니다."
         actions={
           <ModuleHeaderActions
             familySlug={workspaceView.family.slug}
@@ -120,40 +117,31 @@ export default async function DayPlannerRoutePage(props: DayPlannerRoutePageProp
       >
         <ModuleNoticeCard error={searchParams.error} state={searchParams.state} />
 
-        <div className="grid-two">
-          <SurfaceCard
-            title="오늘 반영 상태"
-            description="공동 블록과 개인 handoff 기준을 바로 확인합니다."
-            badge={<StatusPill tone="accent">{timezone}</StatusPill>}
-          >
-            <dl className="fact-grid">
-              <div className="fact-grid__item">
-                <dt>전체 블록</dt>
-                <dd>{blocks.length}건</dd>
-              </div>
-              <div className="fact-grid__item">
-                <dt>today 후보</dt>
-                <dd>{selection.todayBlocks.length}건</dd>
-              </div>
-              <div className="fact-grid__item">
-                <dt>focus 후보</dt>
-                <dd>{selection.focusBlock?.title ?? "-"}</dd>
-              </div>
-              <div className="fact-grid__item">
-                <dt>home 확인</dt>
-                <dd>
-                  <Link href={`/app/${workspaceView.family.slug}`}>가족 홈</Link>
-                </dd>
-              </div>
-            </dl>
-          </SurfaceCard>
-
-          <ModuleRuleListCard
-            description="데이 플래너는 가족 공동 시간 블록 우선, 개인 블록은 handoff가 필요할 때만 focus 카드에 남깁니다."
-            rules={dayPlannerHomeCardRules}
-            title="today / focus 규칙"
-          />
-        </div>
+        <SurfaceCard
+          title="오늘 반영 상태"
+          badge={<StatusPill tone="accent">{timezone}</StatusPill>}
+        >
+          <dl className="fact-grid">
+            <div className="fact-grid__item">
+              <dt>전체 블록</dt>
+              <dd>{blocks.length}건</dd>
+            </div>
+            <div className="fact-grid__item">
+              <dt>today 후보</dt>
+              <dd>{selection.todayBlocks.length}건</dd>
+            </div>
+            <div className="fact-grid__item">
+              <dt>focus 후보</dt>
+              <dd>{selection.focusBlock?.title ?? "-"}</dd>
+            </div>
+            <div className="fact-grid__item">
+              <dt>home 확인</dt>
+              <dd>
+                <Link href={`/app/${workspaceView.family.slug}`}>가족 홈</Link>
+              </dd>
+            </div>
+          </dl>
+        </SurfaceCard>
 
         <SectionHeader
           kicker="Day Planner"
@@ -188,7 +176,6 @@ export default async function DayPlannerRoutePage(props: DayPlannerRoutePageProp
       <PageShell
         eyebrow={`${workspaceView.family.name} Day Planner`}
         title="today 카드 기준 블록"
-        subtitle="가족 공용 + handoff 영향이 있는 공동 블록만 today 카드 기준으로 남습니다."
         actions={
           <ModuleHeaderActions
             familySlug={workspaceView.family.slug}
@@ -222,7 +209,6 @@ export default async function DayPlannerRoutePage(props: DayPlannerRoutePageProp
       <PageShell
         eyebrow={`${workspaceView.family.name} Day Planner`}
         title="새 시간 블록 만들기"
-        subtitle="저장 후 목록과 home today/focus 카드가 바로 다시 계산됩니다."
         actions={
           <ModuleHeaderActions
             familySlug={workspaceView.family.slug}
@@ -233,21 +219,14 @@ export default async function DayPlannerRoutePage(props: DayPlannerRoutePageProp
         }
       >
         <ModuleNoticeCard error={searchParams.error} state={searchParams.state} />
-        <div className="grid-two">
-          <SurfaceCard title="시간 블록 입력">
-            <DayPlannerBlockForm
-              action={createDayPlannerBlockAction}
-              familySlug={workspaceView.family.slug}
-              submitLabel="블록 저장"
-              timezone={timezone}
-            />
-          </SurfaceCard>
-          <ModuleRuleListCard
-            description="공동 블록과 개인 handoff 기준을 같이 보면서 입력할 수 있습니다."
-            rules={dayPlannerHomeCardRules}
-            title="입력 전에 볼 규칙"
+        <SurfaceCard title="시간 블록 입력">
+          <DayPlannerBlockForm
+            action={createDayPlannerBlockAction}
+            familySlug={workspaceView.family.slug}
+            submitLabel="블록 저장"
+            timezone={timezone}
           />
-        </div>
+        </SurfaceCard>
       </PageShell>
     );
   }
@@ -270,7 +249,6 @@ export default async function DayPlannerRoutePage(props: DayPlannerRoutePageProp
       <PageShell
         eyebrow={`${workspaceView.family.name} Day Planner`}
         title={block.title}
-        subtitle="상세에서 수정, 삭제, home 시간 블록 반영 상태를 함께 테스트할 수 있습니다."
         actions={
           <div className="inline-actions">
             <Link className="button button--ghost" href={`/app/${workspaceView.family.slug}/day-planner`}>
@@ -357,7 +335,6 @@ export default async function DayPlannerRoutePage(props: DayPlannerRoutePageProp
       <PageShell
         eyebrow={`${workspaceView.family.name} Day Planner`}
         title="시간 블록 수정"
-        subtitle="같은 폼으로 수정 후 상세와 home 반영을 다시 확인할 수 있습니다."
         actions={
           <div className="inline-actions">
             <Link className="button button--ghost" href={`/app/${workspaceView.family.slug}/day-planner/${block.slug}`}>
@@ -373,26 +350,19 @@ export default async function DayPlannerRoutePage(props: DayPlannerRoutePageProp
         }
       >
         <ModuleNoticeCard error={searchParams.error} state={searchParams.state} />
-        <div className="grid-two">
-          <SurfaceCard title="시간 블록 수정 폼">
-            <DayPlannerBlockForm
-              action={updateDayPlannerBlockAction}
-              block={block}
-              familySlug={workspaceView.family.slug}
-              submitLabel="블록 수정 저장"
-              timezone={timezone}
-            />
-          </SurfaceCard>
-          <SurfaceCard
-            title="현재 home 상태"
-            description="수정 전에 계산된 today / focus 상태를 미리 보여 줍니다."
-          >
-            {renderDayPlannerCard(workspaceView.family.slug, timezone, block, selection)}
-          </SurfaceCard>
-        </div>
+        <SurfaceCard title="시간 블록 수정 폼">
+          <DayPlannerBlockForm
+            action={updateDayPlannerBlockAction}
+            block={block}
+            familySlug={workspaceView.family.slug}
+            submitLabel="블록 수정 저장"
+            timezone={timezone}
+          />
+        </SurfaceCard>
       </PageShell>
     );
   }
 
   notFound();
 }
+

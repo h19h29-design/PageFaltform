@@ -38,9 +38,10 @@ export default async function ConsoleSignInPage({ searchParams }: ConsoleSignInP
 
   return (
     <PageShell
+      mode="console"
       eyebrow="콘솔 로그인"
-      title="운영자 접근은 별도로 관리합니다"
-      subtitle="가족 입장과 운영자 콘솔은 서로 다른 세션을 사용해 빌더와 관리 화면을 보호합니다."
+      title="운영자 콘솔 로그인"
+      subtitle="관리용 세션만 따로 엽니다."
       actions={
         <Link className="button button--ghost" href="/">
           홈으로
@@ -48,17 +49,17 @@ export default async function ConsoleSignInPage({ searchParams }: ConsoleSignInP
       }
     >
       <HeroCard
-        eyebrow="운영자 전용 흐름"
-        title="플랫폼 콘솔에 로그인"
+        eyebrow="운영 전용 흐름"
+        title="플랫폼 콘솔에 로그인합니다."
         subtitle={
           hasDatabase
-            ? "DB 기반 운영자 계정으로 콘솔과 빌더에 접근합니다. 가족 입장 비밀번호로는 이 화면을 열 수 없습니다."
-            : "현재는 데모 운영자 계정으로 콘솔과 빌더를 확인합니다. DATABASE_URL이 없으면 데모 폴백이 유지됩니다."
+            ? "DB 기반 운영자 계정으로 콘솔과 빌더에 접근합니다. 가족 비밀번호나 입장 코드만으로는 이 화면에 들어올 수 없습니다."
+            : "현재는 데모 운영자 계정으로 콘솔과 빌더를 테스트합니다. DB를 붙이지 않아도 로컬 운영 흐름은 바로 확인할 수 있습니다."
         }
         meta={
           <>
             <StatusPill tone={hasDatabase ? "accent" : "warm"}>
-              {hasDatabase ? "DB 기준 모드" : "데모 폴백"}
+              {hasDatabase ? "DB 기준 모드" : "데모 계정 모드"}
             </StatusPill>
             <StatusPill tone="warm">운영자 / 관리자</StatusPill>
           </>
@@ -67,11 +68,11 @@ export default async function ConsoleSignInPage({ searchParams }: ConsoleSignInP
 
       <div className="grid-two">
         <SurfaceCard
-          title="로그인 폼"
+          title="콘솔 로그인"
           description={
             hasDatabase
-              ? "운영자 계정으로 콘솔과 빌더에 접근합니다. 첫 로그인 전에 시드 계정이 필요하면 로컬 부트스트랩을 한 번 실행하세요."
-              : "운영자 계정으로 콘솔과 빌더를 확인합니다. DB 연결 전에는 로컬 검증용 데모 계정을 계속 사용할 수 있습니다."
+              ? "운영자 계정 이메일과 비밀번호로 로그인합니다. 첫 로그인 전에 부트스트랩이 필요하면 오른쪽에서 바로 실행할 수 있습니다."
+              : "데모 운영자 계정으로 콘솔과 빌더를 테스트합니다. DB가 없어도 로컬 운영 흐름은 유지됩니다."
           }
           badge={errorMessage ? <StatusPill tone="danger">로그인 실패</StatusPill> : null}
           tone="accent"
@@ -97,16 +98,15 @@ export default async function ConsoleSignInPage({ searchParams }: ConsoleSignInP
                 <strong>허용 역할</strong>: {consoleRoles}
               </p>
               <p>
-                <strong>세션 유지</strong>: {authFlowDefinitions.consoleSignIn.sessionDurationHours}시간
+                <strong>세션 시간</strong>: {authFlowDefinitions.consoleSignIn.sessionDurationHours}시간
               </p>
               {hasDatabase && resolvedSearchParams.state === "bootstrapped" ? (
                 <p>
-                  <strong>부트스트랩 결과</strong>: 사용자 {resolvedSearchParams.users ?? "0"}명,{" "}
-                  가족 {resolvedSearchParams.families ?? "0"}개
+                  <strong>부트스트랩 결과</strong>: 사용자 {resolvedSearchParams.users ?? "0"}명, 가족{" "}
+                  {resolvedSearchParams.families ?? "0"}개
                 </p>
               ) : null}
-              <p>운영자 세션은 가족 입장 세션과 분리되어 빌더와 관리 화면을 보호합니다.</p>
-              <p>가족 비밀번호나 입장 코드만으로는 콘솔과 운영 설정 화면에 들어올 수 없습니다.</p>
+              <p>운영자 세션은 가족 입장 세션과 분리되어 빌더와 승인 화면을 보호합니다.</p>
             </div>
 
             <div className="inline-actions">
@@ -127,8 +127,8 @@ export default async function ConsoleSignInPage({ searchParams }: ConsoleSignInP
           title={hasDatabase ? "로컬 부트스트랩" : "데모 계정"}
           description={
             hasDatabase
-              ? "웹 런타임에서 데모 운영자, 데모 가족, 파일 기반 가족 정보를 바로 준비할 수 있습니다."
-              : "DB 연결 전에도 아래 계정으로 로컬 테스트를 이어갈 수 있습니다."
+              ? "로컬 테스트에 필요한 운영자 계정과 기본 데이터를 한 번에 넣습니다."
+              : "DB 없이도 바로 콘솔을 볼 수 있도록 준비된 데모 운영자 계정입니다."
           }
         >
           {hasDatabase ? (
@@ -139,8 +139,8 @@ export default async function ConsoleSignInPage({ searchParams }: ConsoleSignInP
                 </button>
               </form>
               <div className="surface-note">
-                <p>데모 운영자 계정을 만들고, 파일 기반 가족 데이터를 함께 가져옵니다.</p>
-                <p>새 로컬 PostgreSQL 데이터베이스라면 `prisma db push` 뒤에 한 번 실행하면 됩니다.</p>
+                <p>데모 운영자 계정과 파일 기반 가족 데이터를 DB 기준선으로 준비합니다.</p>
+                <p>로컬 PostgreSQL이 있으면 이후 `prisma db push` 뒤에 바로 검증할 수 있습니다.</p>
               </div>
             </div>
           ) : null}

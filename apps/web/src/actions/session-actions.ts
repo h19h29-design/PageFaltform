@@ -13,7 +13,7 @@ import {
 } from "../lib/session-cookies";
 
 function isDatabaseSourceOfTruthEnabled(): boolean {
-  return Boolean(process.env.DATABASE_URL);
+  return Boolean(process.env.DATABASE_URL) && process.env.YSPLAN_ENABLE_DB_BASELINE === "1";
 }
 
 async function clearPlatformSessionCookie(): Promise<void> {

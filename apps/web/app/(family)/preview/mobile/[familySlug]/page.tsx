@@ -20,7 +20,7 @@ const mobileScreens = [
   { key: "home", label: "가족 홈", resolveHref: (familySlug: string) => buildFamilyHomeHref(familySlug) },
   { key: "announcements", label: "공지", resolveHref: (familySlug: string) => buildFamilyModuleHref(familySlug, "announcements") },
   { key: "calendar", label: "일정", resolveHref: (familySlug: string) => buildFamilyModuleHref(familySlug, "calendar") },
-  { key: "todo", label: "할 일", resolveHref: (familySlug: string) => buildFamilyModuleHref(familySlug, "todo") },
+  { key: "todo", label: "체크리스트", resolveHref: (familySlug: string) => buildFamilyModuleHref(familySlug, "todo") },
   { key: "school-timetable", label: "시간표", resolveHref: (familySlug: string) => buildFamilyModuleHref(familySlug, "school-timetable") },
   { key: "progress", label: "목표", resolveHref: (familySlug: string) => buildFamilyModuleHref(familySlug, "progress") },
 ] as const;
@@ -39,11 +39,17 @@ export default async function MobilePreviewPage(props: MobilePreviewPageProps) {
   const previewHref = activeScreen.resolveHref(workspaceView.family.slug);
 
   return (
-    <div className="family-scene" style={createFamilySceneStyle(workspaceView.family.theme)}>
+    <div
+      className="family-scene"
+      style={createFamilySceneStyle(
+        workspaceView.family.theme,
+        workspaceView.workspace.themePreset,
+      )}
+    >
       <PageShell
         eyebrow="모바일 미리보기"
         title={`${workspaceView.family.name} 모바일 미리보기`}
-        subtitle="데스크톱에서 휴대폰 화면 비율로 홈과 게시판을 빠르게 점검할 수 있는 전용 주소입니다."
+        subtitle="데스크톱에서 모바일 화면 비율로 홈과 주요 게시판을 빠르게 확인하는 전용 주소입니다."
         actions={
           <div className="inline-actions">
             <Link className="button button--secondary" href={buildFamilyHomeHref(workspaceView.family.slug)}>
@@ -88,7 +94,11 @@ export default async function MobilePreviewPage(props: MobilePreviewPageProps) {
           <div className="mobile-preview-stage">
             <div className="mobile-preview-frame">
               <div className="mobile-preview-frame__notch" />
-              <iframe className="mobile-preview-frame__viewport" src={previewHref} title={`${workspaceView.family.name} ${activeScreen.label} 미리보기`} />
+              <iframe
+                className="mobile-preview-frame__viewport"
+                src={previewHref}
+                title={`${workspaceView.family.name} ${activeScreen.label} 미리보기`}
+              />
             </div>
           </div>
         </div>

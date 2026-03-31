@@ -3,26 +3,61 @@
 import { useState } from "react";
 
 import type { ModuleDescriptor, ModuleKey } from "@ysplan/modules-core";
-import {
-  familyEntryPresetOptions,
-  familyHomePresetOptions,
-  type FamilyEntryPreset,
-  type FamilyHomePreset,
-  type FamilyThemePreset,
-  type FamilyWorkspaceDraft,
+import type {
+  FamilyEntryPreset,
+  FamilyHomePreset,
+  FamilyThemePreset,
+  FamilyWorkspaceDraft,
 } from "@ysplan/platform";
 import { StatusPill, SurfaceCard } from "@ysplan/ui";
+
+import { getSharedThemePreset } from "../lib/shared-themes";
+import { ThemePresetSelector } from "./theme-preset-selector";
 
 type FamilyBuilderFormProps = {
   familyName: string;
   moduleCatalog: ModuleDescriptor[];
   initialDraft: FamilyWorkspaceDraft;
-  themeOptions: Array<{
-    key: FamilyThemePreset;
-    label: string;
-    description: string;
-  }>;
 };
+
+const familyHomePresetOptions: Array<{
+  key: FamilyHomePreset;
+  label: string;
+  description: string;
+}> = [
+  {
+    key: "balanced",
+    label: "균형형 홈",
+    description: "공지, 일정, 최근 기록을 고르게 섞어 보여주는 기본 홈입니다.",
+  },
+  {
+    key: "planner",
+    label: "플래너형 홈",
+    description: "오늘 해야 할 일과 일정 카드를 먼저 보여주는 실행형 홈입니다.",
+  },
+  {
+    key: "story",
+    label: "기록형 홈",
+    description: "사진, 글, 최근 기록 흐름이 더 잘 보이는 스토리형 홈입니다.",
+  },
+];
+
+const familyEntryPresetOptions: Array<{
+  key: FamilyEntryPreset;
+  label: string;
+  description: string;
+}> = [
+  {
+    key: "guided",
+    label: "안내형 입장",
+    description: "가족홈 분위기와 주요 모듈을 먼저 보여주고 입장 확인으로 이어집니다.",
+  },
+  {
+    key: "direct",
+    label: "바로 입장",
+    description: "입구에서 바로 비밀번호나 코드를 확인하는 빠른 흐름입니다.",
+  },
+];
 
 function moveItem(moduleKeys: ModuleKey[], fromKey: ModuleKey, toKey: ModuleKey): ModuleKey[] {
   if (fromKey === toKey) {
@@ -46,7 +81,6 @@ export function FamilyBuilderForm({
   familyName,
   moduleCatalog,
   initialDraft,
-  themeOptions,
 }: FamilyBuilderFormProps) {
   const [homePreset, setHomePreset] = useState<FamilyHomePreset>(initialDraft.homePreset);
   const [entryPreset, setEntryPreset] = useState<FamilyEntryPreset>(initialDraft.entryPreset);
@@ -60,9 +94,13 @@ export function FamilyBuilderForm({
   );
 
   const orderedEnabledModules = moduleOrder.filter((moduleKey) => enabledModules.has(moduleKey));
-  const selectedHomePreset = familyHomePresetOptions.find((option) => option.key === homePreset);
-  const selectedEntryPreset = familyEntryPresetOptions.find((option) => option.key === entryPreset);
-  const selectedThemePreset = themeOptions.find((option) => option.key === themePreset);
+  const selectedHomePreset =
+    familyHomePresetOptions.find((option) => option.key === homePreset) ??
+    familyHomePresetOptions[0]!;
+  const selectedEntryPreset =
+    familyEntryPresetOptions.find((option) => option.key === entryPreset) ??
+    familyEntryPresetOptions[0]!;
+  const selectedThemePreset = getSharedThemePreset(themePreset);
 
   function handleToggleModule(moduleKey: ModuleKey) {
     setEnabledModules((current) => {
@@ -88,8 +126,8 @@ export function FamilyBuilderForm({
       }
 
       const nextOrder = [...current];
-      const [moved] = nextOrder.splice(currentIndex, 1);
-      nextOrder.splice(nextIndex, 0, moved!);
+      const [movedKey] = nextOrder.splice(currentIndex, 1);
+      nextOrder.splice(nextIndex, 0, movedKey!);
       return nextOrder;
     });
   }
@@ -98,13 +136,12 @@ export function FamilyBuilderForm({
     <div className="builder-grid">
       <input name="homePreset" type="hidden" value={homePreset} />
       <input name="entryPreset" type="hidden" value={entryPreset} />
-      <input name="themePreset" type="hidden" value={themePreset} />
       <input name="enabledModules" type="hidden" value={orderedEnabledModules.join(",")} />
 
       <SurfaceCard
         title="홈 프리셋"
-        description={`${familyName} 첫 화면에서 어떤 정보가 먼저 보일지 정합니다.`}
-        badge={<StatusPill tone="accent">{selectedHomePreset?.label ?? homePreset}</StatusPill>}
+        description={`${familyName} 첫 화면에서 어떤 정보가 먼저 눈에 들어올지 정합니다.`}
+        badge={<StatusPill tone="accent">{selectedHomePreset.label}</StatusPill>}
       >
         <div className="builder-option-grid">
           {familyHomePresetOptions.map((option) => (
@@ -123,8 +160,8 @@ export function FamilyBuilderForm({
 
       <SurfaceCard
         title="입장 흐름"
-        description="가족 입구에서 안내를 먼저 보여줄지, 바로 비밀번호 확인으로 보낼지 정합니다."
-        badge={<StatusPill>{selectedEntryPreset?.label ?? entryPreset}</StatusPill>}
+        description="가족 입구에서 안내를 먼저 보여줄지, 바로 입장 확인으로 보낼지 정합니다."
+        badge={<StatusPill>{selectedEntryPreset.label}</StatusPill>}
       >
         <div className="builder-option-grid builder-option-grid--compact">
           {familyEntryPresetOptions.map((option) => (
@@ -142,29 +179,23 @@ export function FamilyBuilderForm({
       </SurfaceCard>
 
       <SurfaceCard
-        title="테마 프리셋"
-        description="배경 톤과 강조색을 한 번에 바꿔 가족마다 다른 분위기를 줄 수 있습니다."
-        badge={<StatusPill tone="warm">{selectedThemePreset?.label ?? themePreset}</StatusPill>}
+        title="공통 테마 10종"
+        description="가족홈과 클럽이 같은 테마 자산을 공유합니다. 색, 폰트, 분위기를 카드에서 바로 비교하고 고를 수 있습니다."
+        badge={<StatusPill tone="warm">{selectedThemePreset.label}</StatusPill>}
       >
-        <div className="builder-option-grid builder-option-grid--compact">
-          {themeOptions.map((option) => (
-            <button
-              key={option.key}
-              className={`builder-option theme-option${themePreset === option.key ? " builder-option--active" : ""}`}
-              onClick={() => setThemePreset(option.key)}
-              type="button"
-            >
-              <strong>{option.label}</strong>
-              <span>{option.description}</span>
-            </button>
-          ))}
-        </div>
+        <p className="helper-text">{selectedThemePreset.mood}</p>
+        <ThemePresetSelector
+          compact
+          name="themePreset"
+          onChange={setThemePreset}
+          value={themePreset}
+        />
       </SurfaceCard>
 
       <SurfaceCard
         className="builder-stack-card"
         title="모듈 구성"
-        description="체크해서 켜고 끄고, 드래그나 위아래 버튼으로 실제 노출 순서를 조정합니다."
+        description="체크해서 켜고 끄고, 위아래 버튼이나 드래그로 실제 노출 순서를 조절합니다."
         badge={<StatusPill tone="warm">{orderedEnabledModules.length}개 사용 중</StatusPill>}
       >
         {orderedEnabledModules.length > 0 ? (
@@ -181,7 +212,7 @@ export function FamilyBuilderForm({
           </div>
         ) : (
           <div className="builder-empty">
-            최소 한 개 이상의 모듈은 켜두는 편이 좋습니다. 모두 꺼도 저장은 되지만 첫 화면이 많이 비어 보일 수 있습니다.
+            최소 한 개 이상은 켜 두는 편이 좋습니다. 모두 끄면 첫 화면이 너무 비어 보일 수 있습니다.
           </div>
         )}
 
@@ -197,11 +228,11 @@ export function FamilyBuilderForm({
 
             return (
               <li
+                key={module.key}
                 className={`builder-module${isEnabled ? "" : " builder-module--disabled"}${
                   draggingKey === module.key ? " builder-module--dragging" : ""
                 }`}
                 draggable
-                key={module.key}
                 onDragEnd={() => setDraggingKey(null)}
                 onDragOver={(event) => event.preventDefault()}
                 onDragStart={() => setDraggingKey(module.key)}

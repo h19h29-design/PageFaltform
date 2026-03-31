@@ -1,9 +1,4 @@
-import {
-  getFamilyEntryPresetOption,
-  getFamilyHomePresetOption,
-  resolveFamilyWorkspace,
-  type FamilyWorkspaceDraft,
-} from "@ysplan/platform";
+import { resolveFamilyWorkspace, type FamilyWorkspaceDraft } from "@ysplan/platform";
 import { getModuleDescriptors } from "@ysplan/tenant";
 
 import {
@@ -28,6 +23,32 @@ export interface EffectiveFamilyWorkspace {
   moduleDescriptors: ReturnType<typeof getModuleDescriptors>;
 }
 
+const homePresetMeta = {
+  balanced: {
+    label: "균형형 홈",
+    description: "중요 공지와 오늘 일정, 최근 기록을 고르게 보여주는 기본 홈입니다.",
+  },
+  planner: {
+    label: "플래너형 홈",
+    description: "오늘 해야 할 일과 일정 카드를 가장 먼저 보여주는 실행 중심 홈입니다.",
+  },
+  story: {
+    label: "기록형 홈",
+    description: "사진, 글, 최근 기록을 자연스럽게 이어 붙여 보여주는 스토리형 홈입니다.",
+  },
+} as const;
+
+const entryPresetMeta = {
+  guided: {
+    label: "안내형 입장",
+    description: "가족 분위기와 모듈 구성을 먼저 보여준 뒤 입장 확인으로 이어집니다.",
+  },
+  direct: {
+    label: "바로 입장",
+    description: "입구에서 곧바로 비밀번호나 입장 코드를 확인하는 빠른 흐름입니다.",
+  },
+} as const;
+
 export function buildEffectiveFamilyWorkspace(
   family: RuntimeFamilyRecord,
   workspaceDraft: FamilyWorkspaceDraft | null,
@@ -37,8 +58,8 @@ export function buildEffectiveFamilyWorkspace(
     defaultModules: family.enabledModules,
     override: workspaceDraft,
   });
-  const homePreset = getFamilyHomePresetOption(workspace.homePreset);
-  const entryPreset = getFamilyEntryPresetOption(workspace.entryPreset);
+  const homePreset = homePresetMeta[workspace.homePreset];
+  const entryPreset = entryPresetMeta[workspace.entryPreset];
   const themePreset =
     familyThemePresetOptions.find((option) => option.key === workspace.themePreset) ??
     familyThemePresetOptions[0]!;

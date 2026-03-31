@@ -24,8 +24,8 @@ export default async function FamilyModuleEditPage({ params }: FamilyModuleEditP
   return (
     <FamilyAppShell
       canManage={familyAppView.canManage}
-      subtitle={spec.summary}
-      title={`${spec.label} edit`}
+      subtitle=""
+      title={`${spec.label} 수정`}
       viewerRole={familyAppView.viewerRole}
       workspaceView={familyAppView.workspaceView}
     >

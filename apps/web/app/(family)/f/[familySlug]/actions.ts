@@ -9,6 +9,7 @@ import {
   getMembershipForFamily,
   toFamilyViewerRole,
 } from "@ysplan/auth";
+import { createAuthRuntimeService } from "@ysplan/database";
 
 import { createFamilyJoinRequest } from "../../../../src/lib/family-join-requests";
 import {
@@ -22,6 +23,10 @@ import {
   FAMILY_ACCESS_COOKIE,
   serializeFamilyAccessSession,
 } from "../../../../src/lib/session-cookies";
+
+function isDatabaseSourceOfTruthEnabled(): boolean {
+  return Boolean(process.env.DATABASE_URL) && process.env.YSPLAN_ENABLE_DB_BASELINE === "1";
+}
 
 export async function submitFamilyJoinRequestAction(formData: FormData) {
   const familySlug = String(formData.get("familySlug") ?? "").trim().toLowerCase();
@@ -86,13 +91,19 @@ export async function submitApprovedFamilyEntryAction(formData: FormData) {
     redirect(`/f/${family.slug}?error=approval-required`);
   }
 
-  const session = createFamilyAccessSession({
-    familySlug: family.slug,
-    tenantId: family.id,
-    viewerRole: membership ? toFamilyViewerRole(membership.role) : "member",
-    userId: platformSession.userId,
-    now: new Date(),
-  });
+  const session = isDatabaseSourceOfTruthEnabled()
+    ? await createAuthRuntimeService().createFamilyAccessSessionForFamily({
+        familySlug: family.slug,
+        userId: platformSession.userId,
+        viewerRole: membership ? toFamilyViewerRole(membership.role) : "member",
+      })
+    : createFamilyAccessSession({
+        familySlug: family.slug,
+        tenantId: family.id,
+        viewerRole: membership ? toFamilyViewerRole(membership.role) : "member",
+        userId: platformSession.userId,
+        now: new Date(),
+      });
   const cookieStore = await cookies();
 
   cookieStore.set(FAMILY_ACCESS_COOKIE, serializeFamilyAccessSession(session), {

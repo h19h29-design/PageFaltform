@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "metadata": {
+    "backend": "file",
+    "lastWriteAt": "2026-03-31T08:59:58.291Z"
+  },
+  "requests": [
+    {
+      "id": "club-join-7ffc6a77-c004-4d44-9846-05fea31ed919",
+      "clubSlug": "bpage-running-crew",
+      "clubName": "B-page ?? ??",
+      "requesterUserId": "local-user-0ee8a983-b9aa-48ef-a9db-b44495dfd56d",
+      "requesterDisplayName": "?????",
+      "requesterEmail": "club-flow-1774947598266@example.com",
+      "requesterPlatformRole": "associate-member",
+      "introMessage": "?? ?? ?? ??????.",
+      "status": "approved",
+      "requestedAt": "2026-03-31T08:59:58.284Z",
+      "decidedAt": "2026-03-31T08:59:58.288Z",
+      "decidedByUserId": "local-master-test"
+    }
+  ]
+}

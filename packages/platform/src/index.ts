@@ -52,7 +52,17 @@ export type FamilyHomePreset = "balanced" | "planner" | "story";
 
 export type FamilyEntryPreset = "guided" | "direct";
 
-export type FamilyThemePreset = "garden" | "sunset" | "sky";
+export type FamilyThemePreset =
+  | "ocean-depths"
+  | "sunset-boulevard"
+  | "forest-canopy"
+  | "modern-minimalist"
+  | "golden-hour"
+  | "arctic-frost"
+  | "desert-rose"
+  | "tech-innovation"
+  | "botanical-garden"
+  | "midnight-galaxy";
 
 export interface FamilyPresetOption<TPreset extends string> {
   key: TPreset;
@@ -68,6 +78,19 @@ export interface FamilyWorkspaceDraft {
   themePreset: FamilyThemePreset;
   updatedAt: string;
 }
+
+export const familyThemePresetKeys: FamilyThemePreset[] = [
+  "ocean-depths",
+  "sunset-boulevard",
+  "forest-canopy",
+  "modern-minimalist",
+  "golden-hour",
+  "arctic-frost",
+  "desert-rose",
+  "tech-innovation",
+  "botanical-garden",
+  "midnight-galaxy",
+];
 
 export interface FamilyWorkspaceStore {
   version: 1;
@@ -465,7 +488,7 @@ export function createDefaultFamilyWorkspace(
     enabledModules: normalizeModuleKeys(enabledModules),
     homePreset: "balanced",
     entryPreset: "guided",
-    themePreset: "garden",
+    themePreset: "ocean-depths",
     updatedAt: now.toISOString()
   };
 }
@@ -493,12 +516,9 @@ export function resolveFamilyWorkspace(input: {
         ? override.homePreset
         : baseDraft.homePreset,
     entryPreset: override.entryPreset === "direct" ? "direct" : baseDraft.entryPreset,
-    themePreset:
-      override.themePreset === "sunset" || override.themePreset === "sky"
-        ? override.themePreset
-        : override.themePreset === "garden"
-          ? "garden"
-          : baseDraft.themePreset,
+    themePreset: familyThemePresetKeys.includes(override.themePreset as FamilyThemePreset)
+      ? (override.themePreset as FamilyThemePreset)
+      : baseDraft.themePreset,
     updatedAt: override.updatedAt ?? baseDraft.updatedAt
   };
 }

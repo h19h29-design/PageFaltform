@@ -105,9 +105,13 @@ export default async function FamilyEntryPage({
   return (
     <div
       className="family-scene"
-      style={createFamilySceneStyle(workspaceView.family.theme)}
+      style={createFamilySceneStyle(
+        workspaceView.family.theme,
+        workspaceView.workspace.themePreset,
+      )}
     >
       <PageShell
+        mode="public"
         eyebrow={`${workspaceView.family.name} 입구`}
         title={`${workspaceView.family.name} 가족홈`}
         subtitle={workspaceView.family.heroSummary}

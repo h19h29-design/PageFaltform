@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import {
@@ -24,7 +24,6 @@ import {
   ModuleEmptyState,
   ModuleHeaderActions,
   ModuleNoticeCard,
-  ModuleRuleListCard,
 } from "src/lib/schedule-module-page-parts";
 import {
   formatAudienceLabel,
@@ -176,7 +175,6 @@ export default async function CalendarRoutePage(props: CalendarRoutePageProps) {
       <PageShell
         eyebrow={`${workspaceView.family.name} 일정`}
         title="가족 일정표"
-        subtitle="월간 달력과 오늘 일정 목록을 함께 보며, 바로 추가하고 수정할 수 있습니다."
         actions={
           <ModuleHeaderActions
             familySlug={workspaceView.family.slug}
@@ -188,12 +186,10 @@ export default async function CalendarRoutePage(props: CalendarRoutePageProps) {
       >
         <ModuleNoticeCard error={searchParams.error} state={searchParams.state} />
 
-        <div className="grid-two">
-          <SurfaceCard
-            title="이번 달 한눈에 보기"
-            description="날짜 칸을 보며 일정 밀도를 확인하고, 아래 목록에서 세부 내용을 봅니다."
-            badge={<StatusPill tone="accent">{timezone}</StatusPill>}
-          >
+        <SurfaceCard
+          title="이번 달 한눈에 보기"
+          badge={<StatusPill tone="accent">{timezone}</StatusPill>}
+        >
             <div className="calendar-grid">
               {weekdayLabels.map((label) => (
                 <div className="calendar-grid__weekday" key={label}>
@@ -224,14 +220,7 @@ export default async function CalendarRoutePage(props: CalendarRoutePageProps) {
                 ),
               )}
             </div>
-          </SurfaceCard>
-
-          <ModuleRuleListCard
-            description="가족 공용 일정은 오늘 카드에 우선 반영되고, 개인 일정은 필요할 때 보조 카드로 들어갑니다."
-            rules={calendarTodayCardRules}
-            title="홈 반영 규칙"
-          />
-        </div>
+        </SurfaceCard>
 
         <SectionHeader
           kicker="오늘 일정"
@@ -264,7 +253,6 @@ export default async function CalendarRoutePage(props: CalendarRoutePageProps) {
       <PageShell
         eyebrow={`${workspaceView.family.name} 일정`}
         title="오늘 카드 기준 일정"
-        subtitle="가족 홈의 오늘 카드와 같은 기준으로 뽑힌 일정 목록입니다."
         actions={
           <ModuleHeaderActions
             familySlug={workspaceView.family.slug}
@@ -276,28 +264,15 @@ export default async function CalendarRoutePage(props: CalendarRoutePageProps) {
       >
         <ModuleNoticeCard error={searchParams.error} state={searchParams.state} />
 
-        <div className="grid-two">
-          <SurfaceCard
-            title="오늘 카드 집계"
-            description="가족 공용 일정이 우선이며, 필요할 때만 개인 보조 일정이 추가됩니다."
-            badge={<StatusPill tone="accent">{selection.todaySchedules.length}건</StatusPill>}
-          >
-            <p className="feature-copy">
-              보조 카드:{" "}
-              <strong>{selection.focusSchedule ? selection.focusSchedule.title : "현재 없음"}</strong>
-            </p>
-          </SurfaceCard>
-          <SurfaceCard
-            title="확인 포인트"
-            description="오늘 카드에 보이는 일정이 실제 일정표 상세와 연결되는지 확인해보세요."
-          >
-            <ul className="stack-list compact-list">
-              <li>공용 일정인지</li>
-              <li>가족 흐름 반영이 켜져 있는지</li>
-              <li>시간과 장소가 맞는지</li>
-            </ul>
-          </SurfaceCard>
-        </div>
+        <SurfaceCard
+          title="오늘 카드 집계"
+          badge={<StatusPill tone="accent">{selection.todaySchedules.length}건</StatusPill>}
+        >
+          <p className="feature-copy">
+            보조 카드:{" "}
+            <strong>{selection.focusSchedule ? selection.focusSchedule.title : "현재 없음"}</strong>
+          </p>
+        </SurfaceCard>
 
         {selection.todaySchedules.length === 0 ? (
           <ModuleEmptyState
@@ -322,7 +297,6 @@ export default async function CalendarRoutePage(props: CalendarRoutePageProps) {
       <PageShell
         eyebrow={`${workspaceView.family.name} 일정`}
         title="새 일정 만들기"
-        subtitle="저장하면 일정표, 가족 홈 카드, 상세 페이지가 함께 갱신됩니다."
         actions={
           <ModuleHeaderActions
             familySlug={workspaceView.family.slug}
@@ -333,21 +307,14 @@ export default async function CalendarRoutePage(props: CalendarRoutePageProps) {
         }
       >
         <ModuleNoticeCard error={searchParams.error} state={searchParams.state} />
-        <div className="grid-two">
-          <SurfaceCard title="일정 입력">
-            <CalendarScheduleForm
-              action={createCalendarScheduleAction}
-              familySlug={workspaceView.family.slug}
-              submitLabel="일정 저장"
-              timezone={timezone}
-            />
-          </SurfaceCard>
-          <ModuleRuleListCard
-            description="가족 공용 여부와 가족 흐름 반영 여부에 따라 홈 카드 노출 방식이 달라집니다."
-            rules={calendarTodayCardRules}
-            title="입력 전에 볼 규칙"
+        <SurfaceCard title="일정 입력">
+          <CalendarScheduleForm
+            action={createCalendarScheduleAction}
+            familySlug={workspaceView.family.slug}
+            submitLabel="일정 저장"
+            timezone={timezone}
           />
-        </div>
+        </SurfaceCard>
       </PageShell>
     );
   }
@@ -367,7 +334,6 @@ export default async function CalendarRoutePage(props: CalendarRoutePageProps) {
       <PageShell
         eyebrow={`${workspaceView.family.name} 일정`}
         title={schedule.title}
-        subtitle="상세에서 시간, 장소, 홈 카드 반영 상태를 함께 확인할 수 있습니다."
         actions={
           <div className="inline-actions">
             <Link className="button button--ghost" href={`/app/${workspaceView.family.slug}/calendar`}>
@@ -455,7 +421,6 @@ export default async function CalendarRoutePage(props: CalendarRoutePageProps) {
       <PageShell
         eyebrow={`${workspaceView.family.name} 일정`}
         title="일정 수정"
-        subtitle="수정 후 바로 상세 페이지와 가족 홈 반영 상태를 다시 확인할 수 있습니다."
         actions={
           <div className="inline-actions">
             <Link className="button button--ghost" href={`/app/${workspaceView.family.slug}/calendar/${schedule.slug}`}>
@@ -471,26 +436,19 @@ export default async function CalendarRoutePage(props: CalendarRoutePageProps) {
         }
       >
         <ModuleNoticeCard error={searchParams.error} state={searchParams.state} />
-        <div className="grid-two">
-          <SurfaceCard title="일정 수정">
-            <CalendarScheduleForm
-              action={updateCalendarScheduleAction}
-              familySlug={workspaceView.family.slug}
-              schedule={schedule}
-              submitLabel="일정 수정 저장"
-              timezone={timezone}
-            />
-          </SurfaceCard>
-          <SurfaceCard
-            title="현재 표시"
-            description="저장 전에 현재 상세 카드 구성을 미리 확인합니다."
-          >
-            {renderCalendarCard(workspaceView.family.slug, timezone, schedule, selection)}
-          </SurfaceCard>
-        </div>
+        <SurfaceCard title="일정 수정">
+          <CalendarScheduleForm
+            action={updateCalendarScheduleAction}
+            familySlug={workspaceView.family.slug}
+            schedule={schedule}
+            submitLabel="일정 수정 저장"
+            timezone={timezone}
+          />
+        </SurfaceCard>
       </PageShell>
     );
   }
 
   notFound();
 }
+

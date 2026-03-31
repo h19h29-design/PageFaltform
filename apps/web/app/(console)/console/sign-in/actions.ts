@@ -9,7 +9,7 @@ import { PLATFORM_USER_COOKIE, serializePlatformUserSession } from "../../../../
 import { submitPlatformSignInAction } from "../../../../src/actions/platform-auth-actions";
 
 export async function submitConsoleSignInAction(formData: FormData) {
-  if (process.env.DATABASE_URL) {
+  if (process.env.DATABASE_URL && process.env.YSPLAN_ENABLE_DB_BASELINE === "1") {
     return submitPlatformSignInAction(formData);
   }
 

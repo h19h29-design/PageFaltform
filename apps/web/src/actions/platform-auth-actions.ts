@@ -26,7 +26,7 @@ import {
 import { resolveDiscoverableRuntimeFamilyFromSlug } from "../lib/family-sites-store";
 
 function isDatabaseSourceOfTruthEnabled(): boolean {
-  return Boolean(process.env.DATABASE_URL);
+  return Boolean(process.env.DATABASE_URL) && process.env.YSPLAN_ENABLE_DB_BASELINE === "1";
 }
 
 function toSafeRedirectPath(candidate: string | null, fallback: string): string {
@@ -105,6 +105,7 @@ export async function submitLocalSignUpAction(formData: FormData) {
   const email = String(formData.get("email") ?? "");
   const password = String(formData.get("password") ?? "");
   const selectedFamilySlug = String(formData.get("familySlug") ?? "").trim().toLowerCase();
+  const nextPath = toSafeRedirectPath(String(formData.get("next") ?? ""), "/");
 
   if (!displayName || password.trim().length < 8) {
     redirect("/sign-up?error=weak-password");
@@ -144,7 +145,7 @@ export async function submitLocalSignUpAction(formData: FormData) {
       const session = createLocalPlatformSession(user);
 
       await writePlatformSessionCookie(session);
-      redirect(selectedFamilySlug ? `/f/${selectedFamilySlug}?state=requested` : "/");
+      redirect(selectedFamilySlug ? `/f/${selectedFamilySlug}?state=requested` : nextPath);
     } catch (error) {
       if (error instanceof Error && error.message === "email-already-in-use") {
         redirect("/sign-up?error=email-already-in-use");
@@ -162,12 +163,24 @@ export async function submitLocalSignUpAction(formData: FormData) {
       email,
       passwordHash: hashPassword(password),
     });
+
+    if (selectedFamilySlug && selectedFamilyName) {
+      await createFamilyJoinRequest({
+        familySlug: selectedFamilySlug,
+        familyName: selectedFamilyName,
+        requesterUserId: user.id,
+        requesterDisplayName: user.displayName,
+        requesterEmail: user.email,
+        requesterPlatformRole: "associate-member",
+      });
+    }
+
     const session = await runtimeService.createPlatformSessionForUser({
       userId: user.id,
     });
 
     await writePlatformSessionCookie(session);
-    redirect("/");
+    redirect(selectedFamilySlug ? `/f/${selectedFamilySlug}?state=requested` : nextPath);
   } catch (error) {
     if (error instanceof Error && error.message === "email-already-in-use") {
       redirect("/sign-up?error=email-already-in-use");
